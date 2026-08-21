@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { requirePermission } from "@/lib/auth";
 import { getSiteSettings, saveSiteSettings } from "@/lib/data";
 import type { SiteSettings } from "@/lib/types";
@@ -20,5 +21,11 @@ export async function PUT(request: NextRequest) {
   const current = await getSiteSettings();
   const merged: SiteSettings = { ...current, ...body };
   await saveSiteSettings(merged);
+
+  // यो थपियो:
+  revalidatePath("/", "layout");
+  revalidatePath("/shop");
+  revalidatePath("/admin/settings");
+
   return NextResponse.json(merged);
 }
