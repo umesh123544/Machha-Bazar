@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 import { MessageCircle, Phone, Facebook, Instagram, MapPin, Clock } from "lucide-react";
 import { getSiteSettings, getPageContent } from "@/lib/data";
 
@@ -24,7 +24,7 @@ export default async function ContactPage() {
       <p className="text-sm text-ink-muted mb-8">
         {page?.content || "WhatsApp is the fastest way to reach us."}
       </p>
-      
+      <a
         href={`https://wa.me/${settings.whatsappNumber}`}
         target="_blank"
         rel="noopener noreferrer"
