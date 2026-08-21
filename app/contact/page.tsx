@@ -1,23 +1,30 @@
 import type { Metadata } from "next";
 import { MessageCircle, Phone, Facebook, Instagram, MapPin, Clock } from "lucide-react";
-import { getSiteSettings } from "@/lib/data";
+import { getSiteSettings, getPageContent } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Contact Us",
-  description: "Get in touch with Maccha Bazar via WhatsApp, phone, or social media."
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const page = await getPageContent("contact");
+  return {
+    title: page?.title || "Contact Us",
+    description: "Get in touch with Maccha Bazar via WhatsApp, phone, or social media."
+  };
+}
 
 export default async function ContactPage() {
   const settings = await getSiteSettings();
+  const page = await getPageContent("contact");
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-14">
-      <h1 className="text-2xl sm:text-3xl font-medium text-plum mb-2">Contact us</h1>
-      <p className="text-sm text-ink-muted mb-8">WhatsApp is the fastest way to reach us.</p>
-
-      <a
+      <h1 className="text-2xl sm:text-3xl font-medium text-plum mb-2">
+        {page?.title || "Contact us"}
+      </h1>
+      <p className="text-sm text-ink-muted mb-8">
+        {page?.content || "WhatsApp is the fastest way to reach us."}
+      </p>
+      
         href={`https://wa.me/${settings.whatsappNumber}`}
         target="_blank"
         rel="noopener noreferrer"
@@ -26,7 +33,6 @@ export default async function ContactPage() {
         <MessageCircle size={16} />
         Chat With Us
       </a>
-
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
         <div className="flex items-center gap-3 bg-white border border-cream-soft rounded-xl p-4">
           <Phone size={18} className="text-berry-dark" />
@@ -52,7 +58,6 @@ export default async function ContactPage() {
           <span className="text-sm text-ink">Follow us</span>
         </div>
       </div>
-
       <div className="bg-cream-soft rounded-2xl p-6">
         <h2 className="text-sm font-medium text-plum mb-4">Send a message</h2>
         <form className="space-y-3">
