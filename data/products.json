@@ -1,0 +1,68 @@
+[
+  {
+    "id": "p1",
+    "name": "Red Dragon Guppy",
+    "slug": "red-dragon-guppy",
+    "category": "Guppy",
+    "categorySlug": "guppy",
+    "description": "The Red Dragon Guppy is one of our most popular home-bred varieties, known for its bold red-orange tail and calm temperament. Raised in carefully maintained tanks with stable water parameters, these guppies adapt well to most community aquariums and are a great choice for both beginners and experienced keepers.",
+    "shortDescription": "Bold red-orange tail, calm and hardy, great for community tanks.",
+    "size": "Medium (3-4 cm)",
+    "image": "/icons/fish-placeholder.svg",
+    "galleryImages": ["/icons/fish-placeholder.svg"],
+    "variants": [
+      { "id": "v1", "name": "Male", "price": 300, "stock": 12 },
+      { "id": "v2", "name": "Female", "price": 350, "stock": 8 },
+      { "id": "v3", "name": "Pair", "price": 500, "stock": 6 }
+    ],
+    "stockStatus": "in_stock",
+    "isFeatured": true,
+    "isActive": true,
+    "isComingSoon": false,
+    "createdAt": "2026-06-01T00:00:00.000Z",
+    "updatedAt": "2026-08-01T00:00:00.000Z"
+  },
+  {
+    "id": "p2",
+    "name": "Blue Moscow Guppy",
+    "slug": "blue-moscow-guppy",
+    "category": "Guppy",
+    "categorySlug": "guppy",
+    "description": "Blue Moscow Guppies display a rich, solid metallic blue body that catches the light beautifully in a well-lit tank. This is a limited batch from our current breeding cycle, home-raised with a focus on strong coloration and healthy fins.",
+    "shortDescription": "Rich metallic blue body, limited batch from this breeding cycle.",
+    "size": "Medium (3-4 cm)",
+    "image": "/icons/fish-placeholder.svg",
+    "galleryImages": ["/icons/fish-placeholder.svg"],
+    "variants": [
+      { "id": "v1", "name": "Pair", "price": 450, "stock": 3 }
+    ],
+    "stockStatus": "limited",
+    "isFeatured": true,
+    "isActive": true,
+    "isComingSoon": false,
+    "createdAt": "2026-06-15T00:00:00.000Z",
+    "updatedAt": "2026-08-10T00:00:00.000Z"
+  },
+  {
+    "id": "p3",
+    "name": "Yellow Cobra Guppy",
+    "slug": "yellow-cobra-guppy",
+    "category": "Guppy",
+    "categorySlug": "guppy",
+    "description": "The Yellow Cobra Guppy features a striking snakeskin pattern across a bright yellow base. Home-bred and raised on a varied diet for strong color development, these are a favorite among hobbyists who want a standout centerpiece fish in a planted tank.",
+    "shortDescription": "Bright yellow snakeskin pattern, a favorite centerpiece fish.",
+    "size": "Medium (3-4 cm)",
+    "image": "/icons/fish-placeholder.svg",
+    "galleryImages": ["/icons/fish-placeholder.svg"],
+    "variants": [
+      { "id": "v1", "name": "Male", "price": 200, "stock": 10 },
+      { "id": "v2", "name": "Pair", "price": 350, "stock": 5 }
+    ],
+    "stockStatus": "in_stock",
+    "isFeatured": false,
+    "isActive": true,
+    "isComingSoon": false,
+    "createdAt": "2026-07-01T00:00:00.000Z",
+    "updatedAt": "2026-08-05T00:00:00.000Z"
+  }
+]

@@ -1,0 +1,10 @@
+[
+  { "id": "c1", "name": "Guppy", "slug": "guppy", "description": "Home-bred guppy varieties.", "active": true, "comingSoon": false, "sortOrder": 1 },
+  { "id": "c2", "name": "Betta Fish", "slug": "betta", "description": "Coming soon.", "active": false, "comingSoon": true, "sortOrder": 2 },
+  { "id": "c3", "name": "Molly", "slug": "molly", "description": "Coming soon.", "active": false, "comingSoon": true, "sortOrder": 3 },
+  { "id": "c4", "name": "Platy", "slug": "platy", "description": "Coming soon.", "active": false, "comingSoon": true, "sortOrder": 4 },
+  { "id": "c5", "name": "Tetra", "slug": "tetra", "description": "Coming soon.", "active": false, "comingSoon": true, "sortOrder": 5 },
+  { "id": "c6", "name": "Aquarium Plants", "slug": "plants", "description": "Coming soon.", "active": false, "comingSoon": true, "sortOrder": 6 },
+  { "id": "c7", "name": "Fish Food", "slug": "fish-food", "description": "Coming soon.", "active": false, "comingSoon": true, "sortOrder": 7 },
+  { "id": "c8", "name": "Aquarium Accessories", "slug": "accessories", "description": "Coming soon.", "active": false, "comingSoon": true, "sortOrder": 8 }
+]
