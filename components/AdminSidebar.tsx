@@ -1,9 +1,8 @@
 "use client";
-
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, Fish, LogOut, Settings, Users } from "lucide-react";
+import { LayoutDashboard, Fish, LogOut, Settings, Users, Layers, FileText } from "lucide-react";
 import type { AdminPermissions } from "@/lib/types";
 
 export default function AdminSidebar() {
@@ -26,8 +25,10 @@ export default function AdminSidebar() {
   const items = [
     { href: "/admin", label: "Overview", icon: LayoutDashboard, show: true },
     { href: "/admin/products", label: "Products", icon: Fish, show: isOwner || permissions?.products },
+    { href: "/admin/categories", label: "Categories", icon: Layers, show: isOwner || permissions?.products },
+    { href: "/admin/pages", label: "Page Content", icon: FileText, show: isOwner || permissions?.content },
     { href: "/admin/settings", label: "Settings & Banner", icon: Settings, show: isOwner || permissions?.content },
-    { href: "/admin/users", label: "Users", icon: Users, show: isOwner || permissions?.users }
+    { href: "/admin/users", label: "Users", icon: Users, show: isOwner || permissions?.users },
   ];
 
   async function handleLogout() {
@@ -50,7 +51,7 @@ export default function AdminSidebar() {
               }`}
             >
               <item.icon size={16} />
-              {item.label}
+              <span className="hidden sm:inline">{item.label}</span>
             </Link>
           ))}
         <button
@@ -58,7 +59,7 @@ export default function AdminSidebar() {
           className="flex items-center gap-2 text-sm px-3 py-2 rounded-lg text-cream/60 hover:text-cream mt-auto"
         >
           <LogOut size={16} />
-          Log out
+          <span className="hidden sm:inline">Log out</span>
         </button>
       </div>
     </aside>
