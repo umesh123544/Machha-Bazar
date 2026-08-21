@@ -280,3 +280,51 @@ export async function deleteAdminUser(id: string): Promise<void> {
   const { error } = await supabaseAdmin.from("admin_users").delete().eq("id", id);
   if (error) throw error;
 }
+// ---- page content ----
+
+type PageContentRow = {
+  id: string;
+  title: string;
+  content: string;
+  updated_at: string;
+};
+
+export type PageContent = {
+  id: string;
+  title: string;
+  content: string;
+  updatedAt: string;
+};
+
+export async function getPageContent(id: string): Promise<PageContent | null> {
+  const { data, error } = await supabaseAdmin
+    .from("page_content")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) return null;
+  const r = data as PageContentRow;
+  return { id: r.id, title: r.title, content: r.content, updatedAt: r.updated_at };
+}
+
+export async function savePageContent(id: string, title: string, content: string): Promise<void> {
+  const { error } = await supabaseAdmin
+    .from("page_content")
+    .upsert({ id, title, content, updated_at: new Date().toISOString() });
+  if (error) throw error;
+}
+
+export async function getAllPageContent(): Promise<PageContent[]> {
+  const { data, error } = await supabaseAdmin
+    .from("page_content")
+    .select("*")
+    .order("id", { ascending: true });
+  if (error) throw error;
+  return (data as PageContentRow[]).map((r) => ({
+    id: r.id,
+    title: r.title,
+    content: r.content,
+    updatedAt: r.updated_at,
+  }));
+}
