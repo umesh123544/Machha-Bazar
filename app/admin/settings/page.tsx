@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
-import type { SiteSettings, HomepageWhyItem, HomepageStep } from "@/lib/types";
+import type { SiteSettings, HomepageWhyItem, HomepageStep, BannerSlide } from "@/lib/types";
 import ImageUploader from "@/components/ImageUploader";
+import { FONT_OPTIONS } from "@/lib/fonts";
 
 const ICON_OPTIONS = ["Egg", "Fish", "Camera", "Truck", "Heart", "ShieldCheck", "Leaf", "Star", "Droplet", "Sparkles"];
 
@@ -87,6 +88,29 @@ export default function AdminSettingsPage() {
     updateHomepage("steps", settings.homepageContent.steps.filter((_, i) => i !== index));
   }
 
+  function updateSlide(index: number, patch: Partial<BannerSlide>) {
+    if (!settings) return;
+    const slides = settings.bannerSlides.map((s, i) => (i === index ? { ...s, ...patch } : s));
+    update("bannerSlides", slides);
+  }
+
+  function addSlide() {
+    if (!settings || settings.bannerSlides.length >= 5) return;
+    const newSlide: BannerSlide = {
+      id: `slide-${Date.now()}`,
+      image: "",
+      badge: "",
+      headline: "",
+      subheading: ""
+    };
+    update("bannerSlides", [...settings.bannerSlides, newSlide]);
+  }
+
+  function removeSlide(index: number) {
+    if (!settings) return;
+    update("bannerSlides", settings.bannerSlides.filter((_, i) => i !== index));
+  }
+
   if (loading || !settings) {
     return <p className="text-sm text-ink-muted">Loading settings...</p>;
   }
@@ -113,7 +137,7 @@ export default function AdminSettingsPage() {
           <h2 className="text-sm font-medium text-plum mb-1">Homepage banner</h2>
           <div>
             <label className="text-xs text-ink-muted mb-2 block">Banner layout</label>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               <button
                 type="button"
                 onClick={() => update("bannerTemplate", "classic")}
@@ -128,7 +152,7 @@ export default function AdminSettingsPage() {
                   </div>
                 </div>
                 <div className="text-xs font-medium text-plum">Classic</div>
-                <div className="text-[11px] text-ink-muted">Full-width photo with text over a dark overlay.</div>
+                <div className="text-[11px] text-ink-muted">Full photo, text over a dark overlay.</div>
               </button>
               <button
                 type="button"
@@ -145,13 +169,137 @@ export default function AdminSettingsPage() {
                   <div className="w-1/2 bg-plum" />
                 </div>
                 <div className="text-xs font-medium text-plum">Split</div>
-                <div className="text-[11px] text-ink-muted">Photo on one side, text on a plain background on the other.</div>
+                <div className="text-[11px] text-ink-muted">Photo one side, text on the other.</div>
+              </button>
+              <button
+                type="button"
+                onClick={() => update("bannerTemplate", "centered")}
+                className={`text-left border rounded-lg p-3 ${
+                  settings.bannerTemplate === "centered" ? "border-berry ring-1 ring-berry" : "border-cream-soft"
+                }`}
+              >
+                <div className="h-14 rounded-md bg-plum mb-2 flex flex-col items-center justify-center gap-1">
+                  <div className="h-1.5 w-1/3 bg-amber/70 rounded-full" />
+                  <div className="h-2 w-2/3 bg-cream/80 rounded-full" />
+                </div>
+                <div className="text-xs font-medium text-plum">Centered</div>
+                <div className="text-[11px] text-ink-muted">Center-aligned headline over photo.</div>
+              </button>
+              <button
+                type="button"
+                onClick={() => update("bannerTemplate", "card")}
+                className={`text-left border rounded-lg p-3 ${
+                  settings.bannerTemplate === "card" ? "border-berry ring-1 ring-berry" : "border-cream-soft"
+                }`}
+              >
+                <div className="h-14 rounded-md bg-berry/10 mb-2 flex items-center gap-1.5 p-1.5">
+                  <div className="w-2/5 space-y-1 pl-0.5">
+                    <div className="h-1.5 w-3/4 bg-plum/70 rounded-full" />
+                    <div className="h-1.5 w-1/2 bg-plum/40 rounded-full" />
+                  </div>
+                  <div className="w-3/5 h-full bg-plum rounded-md shadow-sm" />
+                </div>
+                <div className="text-xs font-medium text-plum">Card</div>
+                <div className="text-[11px] text-ink-muted">Floating photo card, e-commerce style.</div>
+              </button>
+              <button
+                type="button"
+                onClick={() => update("bannerTemplate", "gradient")}
+                className={`text-left border rounded-lg p-3 ${
+                  settings.bannerTemplate === "gradient" ? "border-berry ring-1 ring-berry" : "border-cream-soft"
+                }`}
+              >
+                <div
+                  className="h-14 rounded-md mb-2 flex flex-col items-center justify-center gap-1"
+                  style={{ background: "linear-gradient(135deg, #2B1B33 0%, #A34068 100%)" }}
+                >
+                  <div className="h-1.5 w-1/3 bg-white/60 rounded-full" />
+                  <div className="h-2 w-2/3 bg-white/90 rounded-full" />
+                </div>
+                <div className="text-xs font-medium text-plum">Gradient</div>
+                <div className="text-[11px] text-ink-muted">Bold color gradient, no photo needed.</div>
+              </button>
+              <button
+                type="button"
+                onClick={() => update("bannerTemplate", "carousel")}
+                className={`text-left border rounded-lg p-3 ${
+                  settings.bannerTemplate === "carousel" ? "border-berry ring-1 ring-berry" : "border-cream-soft"
+                }`}
+              >
+                <div className="h-14 rounded-md bg-plum mb-2 flex items-center justify-center gap-1 relative px-2">
+                  <div className="w-2/3 space-y-1">
+                    <div className="h-1.5 w-1/2 bg-amber/70 rounded-full" />
+                    <div className="h-2 w-full bg-cream/80 rounded-full" />
+                  </div>
+                  <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 flex gap-0.5">
+                    <div className="h-1 w-3 rounded-full bg-cream" />
+                    <div className="h-1 w-1 rounded-full bg-cream/40" />
+                    <div className="h-1 w-1 rounded-full bg-cream/40" />
+                  </div>
+                </div>
+                <div className="text-xs font-medium text-plum">Carousel (swipe)</div>
+                <div className="text-[11px] text-ink-muted">Up to 5 slides, swipe or auto-advance.</div>
               </button>
             </div>
           </div>
-          <ImageUploader value={settings.bannerImage} onChange={(url) => update("bannerImage", url)} scope="banner" />
-          <div>
-            <label className="text-xs text-ink-muted mb-1 block">Small badge text</label>
+
+          {settings.bannerTemplate === "carousel" ? (
+            <div className="space-y-3 pt-2">
+              <p className="text-[11px] text-ink-muted">
+                Add up to 5 slides. Each slide can have its own photo, badge, headline and subheading. Visitors can swipe between them, and they auto-advance every few seconds.
+              </p>
+              {settings.bannerSlides.map((slide, i) => (
+                <div key={slide.id} className="border border-cream-soft rounded-lg p-3 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-medium text-plum">Slide {i + 1}</span>
+                    <button
+                      type="button"
+                      onClick={() => removeSlide(i)}
+                      className="text-ink-muted hover:text-[#A32D2D] p-1"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                  <ImageUploader value={slide.image} onChange={(url) => updateSlide(i, { image: url })} scope="banner" />
+                  <input
+                    className="w-full text-sm rounded-lg border border-cream-soft px-3 py-2"
+                    placeholder="Small badge text (optional)"
+                    value={slide.badge}
+                    onChange={(e) => updateSlide(i, { badge: e.target.value })}
+                  />
+                  <input
+                    className="w-full text-sm rounded-lg border border-cream-soft px-3 py-2"
+                    placeholder="Headline"
+                    value={slide.headline}
+                    onChange={(e) => updateSlide(i, { headline: e.target.value })}
+                  />
+                  <textarea
+                    className="w-full text-sm rounded-lg border border-cream-soft px-3 py-2"
+                    placeholder="Subheading (optional)"
+                    rows={2}
+                    value={slide.subheading}
+                    onChange={(e) => updateSlide(i, { subheading: e.target.value })}
+                  />
+                </div>
+              ))}
+              {settings.bannerSlides.length < 5 && (
+                <button
+                  type="button"
+                  onClick={addSlide}
+                  className="flex items-center gap-1 text-xs font-medium text-berry-dark"
+                >
+                  <Plus size={14} /> Add slide ({settings.bannerSlides.length}/5)
+                </button>
+              )}
+              {settings.bannerSlides.length === 0 && (
+                <p className="text-[11px] text-[#A32D2D]">Add at least one slide, or the classic banner will show instead.</p>
+              )}
+            </div>
+          ) : (
+            <>
+              <ImageUploader value={settings.bannerImage} onChange={(url) => update("bannerImage", url)} scope="banner" />
+              <div>
+                <label className="text-xs text-ink-muted mb-1 block">Small badge text</label>
             <input
               value={settings.bannerBadge}
               onChange={(e) => update("bannerBadge", e.target.value)}
@@ -176,6 +324,87 @@ export default function AdminSettingsPage() {
               className="w-full text-sm rounded-lg border border-cream-soft px-3 py-2.5"
               placeholder="Healthy, carefully raised aquarium fish for your home."
             />
+          </div>
+            </>
+          )}
+        </section>
+
+        <section className="bg-white border border-cream-soft rounded-xl p-5 space-y-4">
+          <h2 className="text-sm font-medium text-plum mb-1">Look & feel</h2>
+          <p className="text-[11px] text-ink-muted -mt-2">
+            Changes apply across the whole site — header, buttons, badges, and admin panel.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label className="text-xs text-ink-muted mb-1 block">Primary color</label>
+              <p className="text-[11px] text-ink-muted mb-2">Header, footer, dark backgrounds &amp; text</p>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={settings.primaryColor}
+                  onChange={(e) => update("primaryColor", e.target.value)}
+                  className="w-10 h-10 rounded-lg border border-cream-soft cursor-pointer p-0.5 bg-white"
+                />
+                <input
+                  value={settings.primaryColor}
+                  onChange={(e) => update("primaryColor", e.target.value)}
+                  className="flex-1 text-sm rounded-lg border border-cream-soft px-3 py-2 font-mono"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="text-xs text-ink-muted mb-1 block">Accent color</label>
+              <p className="text-[11px] text-ink-muted mb-2">Buttons, links &amp; call-to-actions</p>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={settings.accentColor}
+                  onChange={(e) => update("accentColor", e.target.value)}
+                  className="w-10 h-10 rounded-lg border border-cream-soft cursor-pointer p-0.5 bg-white"
+                />
+                <input
+                  value={settings.accentColor}
+                  onChange={(e) => update("accentColor", e.target.value)}
+                  className="flex-1 text-sm rounded-lg border border-cream-soft px-3 py-2 font-mono"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="text-xs text-ink-muted mb-1 block">Highlight color</label>
+              <p className="text-[11px] text-ink-muted mb-2">Badges &amp; small highlights</p>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={settings.highlightColor}
+                  onChange={(e) => update("highlightColor", e.target.value)}
+                  className="w-10 h-10 rounded-lg border border-cream-soft cursor-pointer p-0.5 bg-white"
+                />
+                <input
+                  value={settings.highlightColor}
+                  onChange={(e) => update("highlightColor", e.target.value)}
+                  className="flex-1 text-sm rounded-lg border border-cream-soft px-3 py-2 font-mono"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-cream-soft pt-4">
+            <label className="text-xs text-ink-muted mb-2 block">Site font</label>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {FONT_OPTIONS.map((f) => (
+                <button
+                  key={f.name}
+                  type="button"
+                  onClick={() => update("siteFont", f.name)}
+                  className={`text-left border rounded-lg px-3 py-2.5 ${
+                    settings.siteFont === f.name ? "border-berry ring-1 ring-berry" : "border-cream-soft"
+                  }`}
+                >
+                  <div className="text-sm text-plum" style={{ fontFamily: f.stack }}>{f.name}</div>
+                  <div className="text-[10px] text-ink-muted">{f.preview}</div>
+                </button>
+              ))}
+            </div>
           </div>
         </section>
 
