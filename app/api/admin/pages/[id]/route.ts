@@ -28,9 +28,9 @@ export async function PUT(
 
   const { id } = await params;
   const body = await request.json();
-  const { title, content } = body as { title: string; content: string };
+  const { title, content, image } = body as { title: string; content: string; image?: string };
 
-  await savePageContent(id, title, content);
+  await savePageContent(id, title, content, image || "");
 
   revalidatePath("/about");
   revalidatePath("/care-guide");
