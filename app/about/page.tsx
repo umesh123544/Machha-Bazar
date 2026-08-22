@@ -20,6 +20,14 @@ export default async function AboutPage() {
       <h1 className="text-2xl sm:text-3xl font-medium text-plum mb-6">
         {page?.title || "About Maccha Bazar"}
       </h1>
+      {page?.image && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={page.image}
+          alt={page.title || "About Maccha Bazar"}
+          className="w-full h-56 sm:h-72 object-cover rounded-2xl mb-8"
+        />
+      )}
       <div className="space-y-4 text-sm sm:text-base text-ink-muted leading-relaxed">
         {paragraphs.map((p, i) => (
           <p key={i}>{p}</p>
