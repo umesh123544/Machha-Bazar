@@ -74,10 +74,12 @@ export type SiteSettings = {
   deliveryNote: string;
   facebookUrl: string;
   instagramUrl: string;
+  logoUrl: string;
   bannerImage: string;
   bannerBadge: string;
   bannerHeadline: string;
   bannerSubheading: string;
+  bannerTemplate: "classic" | "split";
   homepageContent: HomepageContent;
 };
 
