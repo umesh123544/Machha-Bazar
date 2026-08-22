@@ -314,6 +314,7 @@ type PageContentRow = {
   id: string;
   title: string;
   content: string;
+  image: string | null;
   updated_at: string;
 };
 
@@ -321,6 +322,7 @@ export type PageContent = {
   id: string;
   title: string;
   content: string;
+  image: string;
   updatedAt: string;
 };
 
@@ -333,13 +335,13 @@ export async function getPageContent(id: string): Promise<PageContent | null> {
   if (error) throw error;
   if (!data) return null;
   const r = data as PageContentRow;
-  return { id: r.id, title: r.title, content: r.content, updatedAt: r.updated_at };
+  return { id: r.id, title: r.title, content: r.content, image: r.image || "", updatedAt: r.updated_at };
 }
 
-export async function savePageContent(id: string, title: string, content: string): Promise<void> {
+export async function savePageContent(id: string, title: string, content: string, image: string): Promise<void> {
   const { error } = await supabaseAdmin
     .from("page_content")
-    .upsert({ id, title, content, updated_at: new Date().toISOString() });
+    .upsert({ id, title, content, image: image || null, updated_at: new Date().toISOString() });
   if (error) throw error;
 }
 
@@ -353,6 +355,7 @@ export async function getAllPageContent(): Promise<PageContent[]> {
     id: r.id,
     title: r.title,
     content: r.content,
+    image: r.image || "",
     updatedAt: r.updated_at,
   }));
 }
