@@ -2,7 +2,16 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, Fish, LogOut, Settings, Users, Layers, FileText } from "lucide-react";
+import {
+  LayoutDashboard,
+  Fish,
+  LogOut,
+  Settings,
+  Users,
+  Layers,
+  FileText,
+  Contact
+} from "lucide-react";
 import type { AdminPermissions } from "@/lib/types";
 
 export default function AdminSidebar() {
@@ -10,6 +19,7 @@ export default function AdminSidebar() {
   const router = useRouter();
   const [permissions, setPermissions] = useState<AdminPermissions | null>(null);
   const [isOwner, setIsOwner] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
 
   useEffect(() => {
     fetch("/api/admin/me")
@@ -18,6 +28,7 @@ export default function AdminSidebar() {
         if (data) {
           setPermissions(data.permissions);
           setIsOwner(data.isOwner);
+          setLoggedIn(true);
         }
       });
   }, []);
@@ -28,7 +39,13 @@ export default function AdminSidebar() {
     { href: "/admin/categories", label: "Categories", icon: Layers, show: isOwner || permissions?.products },
     { href: "/admin/pages", label: "Page Content", icon: FileText, show: isOwner || permissions?.content },
     { href: "/admin/settings", label: "Settings & Banner", icon: Settings, show: isOwner || permissions?.content },
-    { href: "/admin/users", label: "Users", icon: Users, show: isOwner || permissions?.users },
+    {
+      href: "/admin/customers",
+      label: "Customers",
+      icon: Contact,
+      show: loggedIn
+    },
+    { href: "/admin/users", label: "Users", icon: Users, show: isOwner || permissions?.users }
   ];
 
   async function handleLogout() {

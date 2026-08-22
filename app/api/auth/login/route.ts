@@ -4,7 +4,7 @@ import {
   createCustomerSessionToken,
   getCustomerSessionCookieName
 } from "@/lib/customer-auth";
-import { getCustomerByEmail } from "@/lib/data";
+import { getCustomerByEmail, touchCustomerLogin } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
 
@@ -36,6 +36,8 @@ export async function POST(request: NextRequest) {
         { status: 401 }
       );
     }
+
+    await touchCustomerLogin(user.id);
 
     const token = createCustomerSessionToken({
       customerId: user.id,

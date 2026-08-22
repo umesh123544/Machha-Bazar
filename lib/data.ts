@@ -406,6 +406,7 @@ type CustomerRow = {
   notes: string;
   created_at: string;
   updated_at: string;
+  last_login_at: string | null;
 };
 
 export type Customer = {
@@ -418,6 +419,7 @@ export type Customer = {
   notes: string;
   createdAt: string;
   updatedAt: string;
+  lastLoginAt: string | null;
 };
 
 function rowToCustomer(r: CustomerRow): Customer {
@@ -430,7 +432,8 @@ function rowToCustomer(r: CustomerRow): Customer {
     deliveryArea: r.delivery_area,
     notes: r.notes,
     createdAt: r.created_at,
-    updatedAt: r.updated_at
+    updatedAt: r.updated_at,
+    lastLoginAt: r.last_login_at || null
   };
 }
 
@@ -509,4 +512,134 @@ export async function updateCustomer(
     .single();
   if (error) throw error;
   return rowToCustomer(data as CustomerRow);
+}
+
+
+export async function touchCustomerLogin(id: string): Promise<void> {
+  await supabaseAdmin
+    .from("customers")
+    .update({ last_login_at: new Date().toISOString() })
+    .eq("id", id);
+}
+
+export async function getAllCustomers(): Promise<Customer[]> {
+  const { data, error } = await supabaseAdmin
+    .from("customers")
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data as CustomerRow[]).map(rowToCustomer);
+}
+
+export type CustomerOrderItem = {
+  productId: string;
+  slug: string;
+  name: string;
+  variantName: string;
+  price: number;
+  quantity: number;
+};
+
+export type CustomerOrder = {
+  id: string;
+  customerId: string | null;
+  customerName: string;
+  customerPhone: string;
+  customerEmail: string;
+  customerAddress: string;
+  deliveryArea: string;
+  items: CustomerOrderItem[];
+  totalPrice: number;
+  itemCount: number;
+  createdAt: string;
+};
+
+type CustomerOrderRow = {
+  id: string;
+  customer_id: string | null;
+  customer_name: string;
+  customer_phone: string;
+  customer_email: string;
+  customer_address: string;
+  delivery_area: string;
+  items: CustomerOrderItem[];
+  total_price: number;
+  item_count: number;
+  created_at: string;
+};
+
+function rowToOrder(r: CustomerOrderRow): CustomerOrder {
+  return {
+    id: r.id,
+    customerId: r.customer_id,
+    customerName: r.customer_name,
+    customerPhone: r.customer_phone,
+    customerEmail: r.customer_email,
+    customerAddress: r.customer_address,
+    deliveryArea: r.delivery_area,
+    items: Array.isArray(r.items) ? r.items : [],
+    totalPrice: r.total_price,
+    itemCount: r.item_count,
+    createdAt: r.created_at
+  };
+}
+
+export async function createCustomerOrder(input: {
+  customerId: string | null;
+  customerName: string;
+  customerPhone: string;
+  customerEmail: string;
+  customerAddress: string;
+  deliveryArea: string;
+  items: CustomerOrderItem[];
+  totalPrice: number;
+}): Promise<CustomerOrder> {
+  const itemCount = input.items.reduce((sum, i) => sum + i.quantity, 0);
+  const row = {
+    id: `o${Date.now()}`,
+    customer_id: input.customerId,
+    customer_name: input.customerName,
+    customer_phone: input.customerPhone,
+    customer_email: input.customerEmail,
+    customer_address: input.customerAddress,
+    delivery_area: input.deliveryArea,
+    items: input.items,
+    total_price: input.totalPrice,
+    item_count: itemCount,
+    created_at: new Date().toISOString()
+  };
+  const { data, error } = await supabaseAdmin.from("customer_orders").insert(row).select().single();
+  if (error) throw error;
+  return rowToOrder(data as CustomerOrderRow);
+}
+
+export async function getAllCustomerOrders(limit = 100): Promise<CustomerOrder[]> {
+  const { data, error } = await supabaseAdmin
+    .from("customer_orders")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  if (error) throw error;
+  return (data as CustomerOrderRow[]).map(rowToOrder);
+}
+
+export async function getOrdersByCustomerId(customerId: string): Promise<CustomerOrder[]> {
+  const { data, error } = await supabaseAdmin
+    .from("customer_orders")
+    .select("*")
+    .eq("customer_id", customerId)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data as CustomerOrderRow[]).map(rowToOrder);
+}
+
+export async function getCustomerOrderCounts(): Promise<Record<string, number>> {
+  const { data, error } = await supabaseAdmin.from("customer_orders").select("customer_id");
+  if (error) throw error;
+  const counts: Record<string, number> = {};
+  for (const row of data || []) {
+    const id = (row as { customer_id: string | null }).customer_id;
+    if (id) counts[id] = (counts[id] || 0) + 1;
+  }
+  return counts;
 }
