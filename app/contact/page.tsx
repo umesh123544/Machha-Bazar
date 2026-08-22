@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 import { MessageCircle, Phone, Facebook, Instagram, MapPin, Clock } from "lucide-react";
 import { getSiteSettings, getPageContent } from "@/lib/data";
 
