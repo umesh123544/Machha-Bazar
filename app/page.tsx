@@ -4,6 +4,8 @@ import type { LucideIcon } from "lucide-react";
 import { getActiveProducts, getCategories, getSiteSettings } from "@/lib/data";
 import ProductCard from "@/components/ProductCard";
 import InstallPWA from "@/components/InstallPWA";
+import BannerCarousel from "@/components/BannerCarousel";
+import BannerSingle from "@/components/BannerSingle";
 import { whatsappLink, buildInquiryMessage } from "@/lib/whatsapp";
 
 export const dynamic = "force-dynamic";
@@ -33,82 +35,10 @@ export default async function HomePage() {
   return (
     <div>
       <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-10 sm:pt-16 pb-14">
-        {settings.bannerTemplate === "split" ? (
-          <div className="rounded-2xl overflow-hidden grid grid-cols-1 sm:grid-cols-2 border border-cream-soft">
-            <div className="bg-cream-soft px-6 sm:px-10 py-14 sm:py-20 flex flex-col justify-center order-2 sm:order-1">
-              <span className="inline-block text-xs font-medium text-berry-dark bg-berry/10 px-3 py-1.5 rounded-full mb-5 w-fit">
-                {settings.bannerBadge}
-              </span>
-              <h1 className="text-3xl sm:text-4xl font-medium text-plum leading-tight mb-4">
-                {settings.bannerHeadline}
-              </h1>
-              <p className="text-sm sm:text-base text-ink-muted max-w-md mb-2">
-                {settings.bannerSubheading}
-              </p>
-              <p className="text-xs sm:text-sm text-berry-dark mb-8">
-                Home-bred fish &middot; Real photos &middot; Kathmandu Valley delivery
-              </p>
-              <div className="flex flex-wrap gap-3">
-                <Link
-                  href="/shop"
-                  className="bg-berry hover:bg-berry-dark text-berry-text text-sm font-medium px-6 py-3 rounded-lg transition-colors"
-                >
-                  Shop Available Fish
-                </Link>
-                <a
-                  href={`https://wa.me/${settings.whatsappNumber}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 border border-plum/20 text-plum text-sm font-medium px-6 py-3 rounded-lg hover:bg-plum/5 transition-colors"
-                >
-                  <MessageCircle size={16} />
-                  Chat on WhatsApp
-                </a>
-              </div>
-            </div>
-            <div
-              className="bg-plum min-h-[220px] sm:min-h-0 bg-cover bg-center order-1 sm:order-2 relative overflow-hidden"
-              style={settings.bannerImage ? { backgroundImage: `url(${settings.bannerImage})` } : undefined}
-            >
-              {!settings.bannerImage && <Fish className="absolute inset-0 m-auto text-amber/10" size={180} aria-hidden />}
-            </div>
-          </div>
+        {settings.bannerTemplate === "carousel" && settings.bannerSlides.length > 0 ? (
+          <BannerCarousel slides={settings.bannerSlides} whatsappNumber={settings.whatsappNumber} />
         ) : (
-          <div
-            className="bg-plum rounded-2xl px-6 sm:px-12 py-14 sm:py-20 relative overflow-hidden bg-cover bg-center"
-            style={settings.bannerImage ? { backgroundImage: `linear-gradient(rgba(45,20,45,0.72), rgba(45,20,45,0.72)), url(${settings.bannerImage})` } : undefined}
-          >
-            <span className="inline-block text-xs font-medium text-amber bg-amber/10 px-3 py-1.5 rounded-full mb-5">
-              {settings.bannerBadge}
-            </span>
-            <h1 className="text-3xl sm:text-5xl font-medium text-cream leading-tight max-w-xl mb-4">
-              {settings.bannerHeadline}
-            </h1>
-            <p className="text-sm sm:text-base text-cream/60 max-w-md mb-2">
-              {settings.bannerSubheading}
-            </p>
-            <p className="text-xs sm:text-sm text-amber/80 mb-8">
-              Home-bred fish &middot; Real photos &middot; Kathmandu Valley delivery
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <Link
-                href="/shop"
-                className="bg-berry hover:bg-berry-dark text-berry-text text-sm font-medium px-6 py-3 rounded-lg transition-colors"
-              >
-                Shop Available Fish
-              </Link>
-              <a
-                href={`https://wa.me/${settings.whatsappNumber}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 border border-cream/25 text-cream text-sm font-medium px-6 py-3 rounded-lg hover:bg-cream/5 transition-colors"
-              >
-                <MessageCircle size={16} />
-                Chat on WhatsApp
-              </a>
-            </div>
-            {!settings.bannerImage && <Fish className="absolute -right-4 -bottom-6 text-amber/5" size={260} aria-hidden />}
-          </div>
+          <BannerSingle settings={settings} />
         )}
       </section>
 
