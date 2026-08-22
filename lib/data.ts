@@ -1,7 +1,18 @@
 import { supabaseAdmin } from "./supabaseClient";
-import type { Product, Category, SiteSettings, AdminUser, AdminPermissions, HomepageContent, BannerSlide } from "./types";
+import type { Product, Category, SiteSettings, AdminUser, AdminPermissions, HomepageContent, BannerSlide, OfferSettings } from "./types";
 
 // ---- row <-> app-type mapping ----
+
+export const DEFAULT_OFFER: OfferSettings = {
+  enabled: false,
+  title: "Limited time offer",
+  subtitle: "Special deals on selected aquarium fish — order before time runs out.",
+  badge: "OFFER",
+  ctaText: "Shop the offer",
+  ctaLink: "/shop",
+  endsAt: "",
+  image: ""
+};
 
 export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
   availableTitle: "Available now",
@@ -85,6 +96,7 @@ type SettingsRow = {
   homepage_content: HomepageContent | null;
   show_about_page: boolean | null;
   show_delivery_page: boolean | null;
+  offer_settings: OfferSettings | null;
 };
 
 type AdminUserRow = {
@@ -175,7 +187,7 @@ function rowToSettings(r: SettingsRow): SiteSettings {
     bannerBadge: r.banner_badge || "Kathmandu Valley delivery",
     bannerHeadline: r.banner_headline || "Bring home something beautiful.",
     bannerSubheading: r.banner_subheading || "Healthy, carefully raised aquarium fish for your home.",
-    bannerTemplate: (["classic", "split", "centered", "card", "gradient", "carousel"].includes(r.banner_template || "")
+    bannerTemplate: (["classic", "split", "centered", "card", "gradient", "carousel", "magazine", "overlay", "wave"].includes(r.banner_template || "")
       ? r.banner_template
       : "classic") as SiteSettings["bannerTemplate"],
     bannerSlides: Array.isArray(r.banner_slides) ? r.banner_slides.slice(0, 5) : [],
@@ -187,7 +199,10 @@ function rowToSettings(r: SettingsRow): SiteSettings {
       ? { ...DEFAULT_HOMEPAGE_CONTENT, ...r.homepage_content }
       : DEFAULT_HOMEPAGE_CONTENT,
     showAboutPage: r.show_about_page !== false,
-    showDeliveryPage: r.show_delivery_page !== false
+    showDeliveryPage: r.show_delivery_page !== false,
+    offer: r.offer_settings
+      ? { ...DEFAULT_OFFER, ...r.offer_settings }
+      : { ...DEFAULT_OFFER }
   };
 }
 
@@ -219,7 +234,8 @@ function settingsToRow(s: SiteSettings): SettingsRow {
     site_font: s.siteFont || null,
     homepage_content: s.homepageContent || null,
     show_about_page: s.showAboutPage !== false,
-    show_delivery_page: s.showDeliveryPage !== false
+    show_delivery_page: s.showDeliveryPage !== false,
+    offer_settings: s.offer || DEFAULT_OFFER
   };
 }
 

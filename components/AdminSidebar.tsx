@@ -10,7 +10,8 @@ import {
   Users,
   Layers,
   FileText,
-  Contact
+  Contact,
+  Tag
 } from "lucide-react";
 import type { AdminPermissions } from "@/lib/types";
 
@@ -39,6 +40,7 @@ export default function AdminSidebar() {
     { href: "/admin/categories", label: "Categories", icon: Layers, show: isOwner || permissions?.products },
     { href: "/admin/pages", label: "Page Content", icon: FileText, show: isOwner || permissions?.content },
     { href: "/admin/settings", label: "Settings & Banner", icon: Settings, show: isOwner || permissions?.content },
+    { href: "/admin/offers", label: "Offers", icon: Tag, show: isOwner || permissions?.content },
     {
       href: "/admin/customers",
       label: "Customers",

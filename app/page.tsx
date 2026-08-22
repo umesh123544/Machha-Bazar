@@ -42,6 +42,12 @@ export default async function HomePage() {
         )}
       </section>
 
+      {settings.offer?.enabled && (
+        <section className="max-w-6xl mx-auto px-4 sm:px-6 -mt-6 pb-8">
+          <OfferBanner offer={settings.offer} />
+        </section>
+      )}
+
       <section className="max-w-6xl mx-auto px-4 sm:px-6 pb-16">
         <div className="flex items-end justify-between mb-6">
           <div>
