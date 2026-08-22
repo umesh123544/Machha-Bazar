@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import SiteChrome from "@/components/SiteChrome";
 import { getSiteSettings } from "@/lib/data";
+import { getFontOption } from "@/lib/fonts";
+import { rgbTriplet, adjustLightness, darkTextShade } from "@/lib/color";
 
 export const dynamic = "force-dynamic";
 
@@ -41,9 +43,30 @@ export const viewport: Viewport = {
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const settings = await getSiteSettings();
+  const font = getFontOption(settings.siteFont);
+
+  const themeVars = [
+    `--color-plum: ${rgbTriplet(settings.primaryColor)};`,
+    `--color-plum-light: ${adjustLightness(settings.primaryColor, 0.1)};`,
+    `--color-berry: ${rgbTriplet(settings.accentColor)};`,
+    `--color-berry-dark: ${adjustLightness(settings.accentColor, -0.12)};`,
+    `--color-berry-text: ${darkTextShade(settings.accentColor)};`,
+    `--color-amber: ${rgbTriplet(settings.highlightColor)};`,
+    `--color-amber-dark: ${adjustLightness(settings.highlightColor, -0.22)};`,
+    `--font-sans: ${font.stack};`
+  ].join(" ");
 
   return (
     <html lang="en">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href={`https://fonts.googleapis.com/css2?family=${font.googleParam}&display=swap`}
+          rel="stylesheet"
+        />
+        <style dangerouslySetInnerHTML={{ __html: `:root { ${themeVars} }` }} />
+      </head>
       <body className="font-sans text-plum antialiased">
         <SiteChrome settings={settings}>{children}</SiteChrome>
         <script
