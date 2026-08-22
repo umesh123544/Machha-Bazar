@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import ImageUploader from "@/components/ImageUploader";
 
 const PAGES = [
   { id: "about", label: "About Us" },
@@ -7,9 +8,11 @@ const PAGES = [
   { id: "contact", label: "Contact" },
 ];
 
+type PageState = { title: string; content: string; image: string };
+
 export default function AdminPagesPage() {
   const [activeId, setActiveId] = useState("about");
-  const [contents, setContents] = useState<Record<string, { title: string; content: string }>>({});
+  const [contents, setContents] = useState<Record<string, PageState>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
@@ -21,9 +24,13 @@ export default function AdminPagesPage() {
           fetch(`/api/admin/pages/${p.id}`).then((r) => r.json())
         )
       );
-      const map: Record<string, { title: string; content: string }> = {};
+      const map: Record<string, PageState> = {};
       PAGES.forEach((p, i) => {
-        map[p.id] = { title: results[i].title, content: results[i].content };
+        map[p.id] = {
+          title: results[i].title || "",
+          content: results[i].content || "",
+          image: results[i].image || ""
+        };
       });
       setContents(map);
       setLoading(false);
@@ -48,11 +55,26 @@ export default function AdminPagesPage() {
     setTimeout(() => setMsg(""), 3000);
   }
 
-  function update(field: "title" | "content", value: string) {
+  function update(field: keyof PageState, value: string) {
     setContents((prev) => ({
       ...prev,
       [activeId]: { ...prev[activeId], [field]: value },
     }));
+  }
+
+  // Care guide: work with up to 3 separate paragraphs, joined by a blank line in storage.
+  function getParagraphs(content: string): string[] {
+    const parts = content.split("\n\n");
+    while (parts.length < 3) parts.push("");
+    return parts.slice(0, 3);
+  }
+
+  function updateParagraph(index: number, value: string) {
+    const current = contents[activeId];
+    if (!current) return;
+    const parts = getParagraphs(current.content);
+    parts[index] = value;
+    update("content", parts.join("\n\n"));
   }
 
   if (loading) return <p className="text-sm text-ink-muted">Loading...</p>;
@@ -63,7 +85,7 @@ export default function AdminPagesPage() {
     <div>
       <div className="mb-6">
         <h1 className="text-xl font-medium text-plum">Page Content</h1>
-        <p className="text-sm text-ink-muted">Edit About, Care Guide, and Contact page text</p>
+        <p className="text-sm text-ink-muted">Edit About, Care Guide, and Contact page image, title and text</p>
       </div>
 
       {/* Page tabs */}
@@ -84,7 +106,11 @@ export default function AdminPagesPage() {
       </div>
 
       {current && (
-        <div className="bg-white border border-cream-soft rounded-xl p-4 space-y-4">
+        <div className="bg-white border border-cream-soft rounded-xl p-4 space-y-4 max-w-2xl">
+          <div>
+            <label className="text-xs text-ink-muted mb-1 block">Page image</label>
+            <ImageUploader value={current.image} onChange={(url) => update("image", url)} scope="banner" />
+          </div>
           <div>
             <label className="text-xs text-ink-muted mb-1 block">Page Title</label>
             <input
@@ -93,16 +119,34 @@ export default function AdminPagesPage() {
               onChange={(e) => update("title", e.target.value)}
             />
           </div>
-          <div>
-            <label className="text-xs text-ink-muted mb-1 block">
-              Content (each paragraph = new line)
-            </label>
-            <textarea
-              className="w-full border border-cream-soft rounded-lg px-3 py-2 text-sm min-h-[300px] resize-y"
-              value={current.content}
-              onChange={(e) => update("content", e.target.value)}
-            />
-          </div>
+
+          {activeId === "care-guide" ? (
+            <div className="space-y-3">
+              <label className="text-xs text-ink-muted block">Paragraphs (up to 3)</label>
+              {getParagraphs(current.content).map((para, i) => (
+                <div key={i}>
+                  <label className="text-[11px] text-ink-muted mb-1 block">Paragraph {i + 1}</label>
+                  <textarea
+                    className="w-full border border-cream-soft rounded-lg px-3 py-2 text-sm min-h-[100px] resize-y"
+                    value={para}
+                    onChange={(e) => updateParagraph(i, e.target.value)}
+                  />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div>
+              <label className="text-xs text-ink-muted mb-1 block">
+                Content (each paragraph = new line)
+              </label>
+              <textarea
+                className="w-full border border-cream-soft rounded-lg px-3 py-2 text-sm min-h-[300px] resize-y"
+                value={current.content}
+                onChange={(e) => update("content", e.target.value)}
+              />
+            </div>
+          )}
+
           <div className="flex items-center gap-4">
             <button
               onClick={handleSave}

@@ -21,6 +21,14 @@ export default async function ContactPage() {
       <h1 className="text-2xl sm:text-3xl font-medium text-plum mb-2">
         {page?.title || "Contact us"}
       </h1>
+      {page?.image && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={page.image}
+          alt={page.title || "Contact us"}
+          className="w-full h-56 sm:h-72 object-cover rounded-2xl mb-6"
+        />
+      )}
       <p className="text-sm text-ink-muted mb-8">
         {page?.content || "WhatsApp is the fastest way to reach us."}
       </p>
