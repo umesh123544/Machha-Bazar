@@ -62,6 +62,14 @@ export type HomepageContent = {
   ctaSubtitle: string;
 };
 
+export type BannerSlide = {
+  id: string;
+  image: string;
+  badge: string;
+  headline: string;
+  subheading: string;
+};
+
 export type SiteSettings = {
   businessName: string;
   tagline: string;
@@ -79,7 +87,12 @@ export type SiteSettings = {
   bannerBadge: string;
   bannerHeadline: string;
   bannerSubheading: string;
-  bannerTemplate: "classic" | "split";
+  bannerTemplate: "classic" | "split" | "centered" | "card" | "gradient" | "carousel";
+  bannerSlides: BannerSlide[];
+  primaryColor: string;
+  accentColor: string;
+  highlightColor: string;
+  siteFont: string;
   homepageContent: HomepageContent;
 };
 
