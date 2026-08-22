@@ -95,6 +95,10 @@ export type SiteSettings = {
   highlightColor: string;
   siteFont: string;
   homepageContent: HomepageContent;
+  /** When false, /about is hidden from the site (admin can toggle). */
+  showAboutPage: boolean;
+  /** When false, /delivery is hidden from the site (admin can toggle). */
+  showDeliveryPage: boolean;
 };
 
 export type AdminPermissions = {

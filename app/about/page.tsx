@@ -1,9 +1,14 @@
 import type { Metadata } from "next";
-import { getPageContent } from "@/lib/data";
+import { notFound } from "next/navigation";
+import { getPageContent, getSiteSettings } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+  if (settings.showAboutPage === false) {
+    return { title: "Not Found" };
+  }
   const page = await getPageContent("about");
   return {
     title: page?.title || "About Us",
@@ -12,6 +17,11 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function AboutPage() {
+  const settings = await getSiteSettings();
+  if (settings.showAboutPage === false) {
+    notFound();
+  }
+
   const page = await getPageContent("about");
   const paragraphs = (page?.content || "").split("\n").filter((p) => p.trim());
 

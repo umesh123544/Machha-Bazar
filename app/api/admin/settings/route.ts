@@ -25,6 +25,8 @@ export async function PUT(request: NextRequest) {
   // यो थपियो:
   revalidatePath("/", "layout");
   revalidatePath("/shop");
+  revalidatePath("/about");
+  revalidatePath("/delivery");
   revalidatePath("/admin/settings");
 
   return NextResponse.json(merged);

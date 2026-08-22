@@ -675,6 +675,32 @@ export default function AdminSettingsPage() {
           </div>
         </section>
 
+
+        <section className="bg-white border border-cream-soft rounded-xl p-5 space-y-3">
+          <h2 className="text-sm font-medium text-plum mb-1">Page visibility</h2>
+          <p className="text-[11px] text-ink-muted -mt-2">
+            Show or hide About and Delivery pages on the public site. Content is kept even when hidden.
+          </p>
+          <label className="flex items-center gap-3 text-sm text-plum cursor-pointer">
+            <input
+              type="checkbox"
+              checked={settings.showAboutPage !== false}
+              onChange={(e) => update("showAboutPage", e.target.checked)}
+              className="rounded border-cream-soft"
+            />
+            Show About page
+          </label>
+          <label className="flex items-center gap-3 text-sm text-plum cursor-pointer">
+            <input
+              type="checkbox"
+              checked={settings.showDeliveryPage !== false}
+              onChange={(e) => update("showDeliveryPage", e.target.checked)}
+              className="rounded border-cream-soft"
+            />
+            Show Delivery page
+          </label>
+        </section>
+
         <section className="bg-white border border-cream-soft rounded-xl p-5 space-y-3">
           <h2 className="text-sm font-medium text-plum mb-1">Social links</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

@@ -15,32 +15,34 @@ export default function BottomNav({ whatsappNumber }: { whatsappNumber: string }
   ];
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-cream/95 backdrop-blur border-t border-cream-soft flex items-stretch pb-[env(safe-area-inset-bottom)]">
-      {tabs.map((tab) => {
-        const active = tab.href === "/" ? pathname === "/" : pathname?.startsWith(tab.href);
-        const Icon = tab.icon;
-        return (
-          <Link
-            key={tab.href}
-            href={tab.href}
-            className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 text-[11px] font-medium ${
-              active ? "text-berry-dark" : "text-ink-muted"
-            }`}
-          >
-            <Icon size={20} strokeWidth={active ? 2.4 : 2} />
-            {tab.label}
-          </Link>
-        );
-      })}
-      <a
-        href={`https://wa.me/${whatsappNumber}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 text-[11px] font-medium text-[#1E7A6E]"
-      >
-        <MessageCircle size={20} />
-        WhatsApp
-      </a>
+    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-cream/95 backdrop-blur border-t border-cream-soft flex items-stretch pb-[env(safe-area-inset-bottom)]">
+      <div className="flex w-full max-w-2xl mx-auto">
+        {tabs.map((tab) => {
+          const active = tab.href === "/" ? pathname === "/" : pathname?.startsWith(tab.href);
+          const Icon = tab.icon;
+          return (
+            <Link
+              key={tab.href}
+              href={tab.href}
+              className={`flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 text-[11px] font-medium ${
+                active ? "text-berry-dark" : "text-ink-muted"
+              }`}
+            >
+              <Icon size={20} strokeWidth={active ? 2.4 : 2} />
+              {tab.label}
+            </Link>
+          );
+        })}
+        <a
+          href={`https://wa.me/${whatsappNumber}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 text-[11px] font-medium text-[#1E7A6E]"
+        >
+          <MessageCircle size={20} />
+          WhatsApp
+        </a>
+      </div>
     </nav>
   );
 }

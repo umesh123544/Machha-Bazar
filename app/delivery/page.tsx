@@ -1,17 +1,27 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { MessageCircle, Truck } from "lucide-react";
 import { getSiteSettings } from "@/lib/data";
-
-export const dynamic = "force-dynamic";
 import { whatsappLink, buildDeliveryCheckMessage } from "@/lib/whatsapp";
 
-export const metadata: Metadata = {
-  title: "Delivery Information",
-  description: "Live fish delivery information for Kathmandu, Lalitpur, and Bhaktapur from Maccha Bazar."
-};
+export const dynamic = "force-dynamic";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
+  if (settings.showDeliveryPage === false) {
+    return { title: "Not Found" };
+  }
+  return {
+    title: "Delivery Information",
+    description: "Live fish delivery information for Kathmandu, Lalitpur, and Bhaktapur from Maccha Bazar."
+  };
+}
 
 export default async function DeliveryPage() {
   const settings = await getSiteSettings();
+  if (settings.showDeliveryPage === false) {
+    notFound();
+  }
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-14">

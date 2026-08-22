@@ -2,8 +2,6 @@
 
 import { usePathname } from "next/navigation";
 import Navbar from "./Navbar";
-import Footer from "./Footer";
-import AnnouncementBar from "./AnnouncementBar";
 import BottomNav from "./BottomNav";
 import CartDrawer from "./CartDrawer";
 import { CartProvider } from "@/lib/cart-context";
@@ -25,10 +23,8 @@ export default function SiteChrome({
 
   return (
     <CartProvider>
-      <AnnouncementBar />
       <Navbar />
-      <main className="min-h-screen pb-20 md:pb-0">{children}</main>
-      <Footer settings={settings} />
+      <main className="min-h-screen pb-20">{children}</main>
       <BottomNav whatsappNumber={settings.whatsappNumber} />
       <CartDrawer whatsappNumber={settings.whatsappNumber} businessName={settings.businessName} />
     </CartProvider>

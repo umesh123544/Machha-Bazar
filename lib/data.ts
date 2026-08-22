@@ -83,6 +83,8 @@ type SettingsRow = {
   highlight_color: string | null;
   site_font: string | null;
   homepage_content: HomepageContent | null;
+  show_about_page: boolean | null;
+  show_delivery_page: boolean | null;
 };
 
 type AdminUserRow = {
@@ -183,7 +185,9 @@ function rowToSettings(r: SettingsRow): SiteSettings {
     siteFont: r.site_font || "Inter",
     homepageContent: r.homepage_content
       ? { ...DEFAULT_HOMEPAGE_CONTENT, ...r.homepage_content }
-      : DEFAULT_HOMEPAGE_CONTENT
+      : DEFAULT_HOMEPAGE_CONTENT,
+    showAboutPage: r.show_about_page !== false,
+    showDeliveryPage: r.show_delivery_page !== false
   };
 }
 
@@ -213,7 +217,9 @@ function settingsToRow(s: SiteSettings): SettingsRow {
     accent_color: s.accentColor || null,
     highlight_color: s.highlightColor || null,
     site_font: s.siteFont || null,
-    homepage_content: s.homepageContent || null
+    homepage_content: s.homepageContent || null,
+    show_about_page: s.showAboutPage !== false,
+    show_delivery_page: s.showDeliveryPage !== false
   };
 }
 

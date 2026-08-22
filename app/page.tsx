@@ -97,11 +97,13 @@ export default async function HomePage() {
             We currently provide live fish delivery inside Kathmandu Valley, covering {settings.deliveryAreas.join(", ")}.
             {" "}{settings.deliveryNote}
           </p>
-          <div className="flex justify-center">
-            <Link href="/delivery" className="text-sm font-medium text-amber border border-amber/30 px-5 py-2.5 rounded-lg hover:bg-amber/10">
-              Check Delivery Availability
-            </Link>
-          </div>
+          {settings.showDeliveryPage !== false && (
+            <div className="flex justify-center">
+              <Link href="/delivery" className="text-sm font-medium text-amber border border-amber/30 px-5 py-2.5 rounded-lg hover:bg-amber/10">
+                Check Delivery Availability
+              </Link>
+            </div>
+          )}
         </div>
       </section>
 
