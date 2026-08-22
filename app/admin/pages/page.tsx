@@ -62,19 +62,38 @@ export default function AdminPagesPage() {
     }));
   }
 
-  // Care guide: work with up to 3 separate paragraphs, joined by a blank line in storage.
-  function getParagraphs(content: string): string[] {
-    const parts = content.split("\n\n");
-    while (parts.length < 3) parts.push("");
-    return parts.slice(0, 3);
+  // Care guide: up to 3 points, each with its own short title + text.
+  // Stored as JSON in the content field: [{ "title": "...", "text": "..." }, ...]
+  type CarePoint = { title: string; text: string };
+
+  function getCarePoints(content: string): CarePoint[] {
+    try {
+      const parsed = JSON.parse(content);
+      if (Array.isArray(parsed) && parsed.length) {
+        const points: CarePoint[] = parsed.map((p) => ({
+          title: typeof p?.title === "string" ? p.title : "",
+          text: typeof p?.text === "string" ? p.text : ""
+        }));
+        while (points.length < 3) points.push({ title: "", text: "" });
+        return points.slice(0, 3);
+      }
+    } catch {
+      // fall through to legacy plain-text migration below
+    }
+    // Legacy content (plain paragraphs, no titles yet) — migrate into point 1's text.
+    return [
+      { title: "", text: content || "" },
+      { title: "", text: "" },
+      { title: "", text: "" }
+    ];
   }
 
-  function updateParagraph(index: number, value: string) {
+  function updateCarePoint(index: number, patch: Partial<CarePoint>) {
     const current = contents[activeId];
     if (!current) return;
-    const parts = getParagraphs(current.content);
-    parts[index] = value;
-    update("content", parts.join("\n\n"));
+    const points = getCarePoints(current.content);
+    points[index] = { ...points[index], ...patch };
+    update("content", JSON.stringify(points));
   }
 
   if (loading) return <p className="text-sm text-ink-muted">Loading...</p>;
@@ -122,15 +141,26 @@ export default function AdminPagesPage() {
 
           {activeId === "care-guide" ? (
             <div className="space-y-3">
-              <label className="text-xs text-ink-muted block">Paragraphs (up to 3)</label>
-              {getParagraphs(current.content).map((para, i) => (
-                <div key={i}>
-                  <label className="text-[11px] text-ink-muted mb-1 block">Paragraph {i + 1}</label>
-                  <textarea
-                    className="w-full border border-cream-soft rounded-lg px-3 py-2 text-sm min-h-[100px] resize-y"
-                    value={para}
-                    onChange={(e) => updateParagraph(i, e.target.value)}
-                  />
+              <label className="text-xs text-ink-muted block">Points (up to 3, each with its own heading)</label>
+              {getCarePoints(current.content).map((point, i) => (
+                <div key={i} className="border border-cream-soft rounded-lg p-3 space-y-2">
+                  <div>
+                    <label className="text-[11px] text-ink-muted mb-1 block">Point {i + 1} heading</label>
+                    <input
+                      className="w-full border border-cream-soft rounded-lg px-3 py-2 text-sm"
+                      placeholder="e.g. Feeding, Water Quality, Tank Size"
+                      value={point.title}
+                      onChange={(e) => updateCarePoint(i, { title: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] text-ink-muted mb-1 block">Point {i + 1} text</label>
+                    <textarea
+                      className="w-full border border-cream-soft rounded-lg px-3 py-2 text-sm min-h-[100px] resize-y"
+                      value={point.text}
+                      onChange={(e) => updateCarePoint(i, { text: e.target.value })}
+                    />
+                  </div>
                 </div>
               ))}
             </div>
