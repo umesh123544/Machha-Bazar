@@ -71,6 +71,7 @@ type SettingsRow = {
   facebook_url: string;
   instagram_url: string;
   logo_url: string | null;
+  logo_size: string | null;
   banner_image: string | null;
   banner_badge: string | null;
   banner_headline: string | null;
@@ -167,6 +168,7 @@ function rowToSettings(r: SettingsRow): SiteSettings {
     facebookUrl: r.facebook_url,
     instagramUrl: r.instagram_url,
     logoUrl: r.logo_url || "",
+    logoSize: r.logo_size === "small" || r.logo_size === "large" ? r.logo_size : "medium",
     bannerImage: r.banner_image || "",
     bannerBadge: r.banner_badge || "Kathmandu Valley delivery",
     bannerHeadline: r.banner_headline || "Bring home something beautiful.",
@@ -200,6 +202,7 @@ function settingsToRow(s: SiteSettings): SettingsRow {
     facebook_url: s.facebookUrl,
     instagram_url: s.instagramUrl,
     logo_url: s.logoUrl || null,
+    logo_size: s.logoSize || "medium",
     banner_image: s.bannerImage || null,
     banner_badge: s.bannerBadge || null,
     banner_headline: s.bannerHeadline || null,

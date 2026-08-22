@@ -83,6 +83,7 @@ export type SiteSettings = {
   facebookUrl: string;
   instagramUrl: string;
   logoUrl: string;
+  logoSize: "small" | "medium" | "large";
   bannerImage: string;
   bannerBadge: string;
   bannerHeadline: string;

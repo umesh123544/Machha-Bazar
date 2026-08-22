@@ -15,13 +15,16 @@ const links = [
 export default function Navbar({
   whatsappNumber,
   businessName,
-  logoUrl
+  logoUrl,
+  logoSize
 }: {
   whatsappNumber: string;
   businessName: string;
   logoUrl?: string;
+  logoSize?: "small" | "medium" | "large";
 }) {
   const [open, setOpen] = useState(false);
+  const logoHeight = logoSize === "small" ? "h-8" : logoSize === "large" ? "h-14" : "h-11";
 
   return (
     <header className="sticky top-0 z-40 bg-cream/95 backdrop-blur border-b border-cream-soft">
@@ -29,7 +32,7 @@ export default function Navbar({
         <Link href="/" className="flex items-center gap-2 text-lg font-semibold text-plum tracking-tight">
           {logoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={logoUrl} alt={businessName} className="h-9 w-auto object-contain" />
+            <img src={logoUrl} alt={businessName} className={`${logoHeight} w-auto object-contain`} />
           ) : (
             businessName
           )}

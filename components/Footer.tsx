@@ -9,7 +9,11 @@ export default function Footer({ settings }: { settings: SiteSettings }) {
         <div>
           {settings.logoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={settings.logoUrl} alt={settings.businessName} className="h-9 w-auto object-contain mb-1" />
+            <img
+              src={settings.logoUrl}
+              alt={settings.businessName}
+              className={`${settings.logoSize === "small" ? "h-8" : settings.logoSize === "large" ? "h-16" : "h-11"} w-auto object-contain mb-1`}
+            />
           ) : (
             <div className="text-lg font-semibold">{settings.businessName}</div>
           )}

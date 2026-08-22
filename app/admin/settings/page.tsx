@@ -131,6 +131,30 @@ export default function AdminSettingsPage() {
           <div className="max-w-xs">
             <ImageUploader value={settings.logoUrl} onChange={(url) => update("logoUrl", url)} scope="logo" />
           </div>
+          <div>
+            <label className="text-xs text-ink-muted mb-2 block">Logo size</label>
+            <div className="flex gap-2">
+              {(["small", "medium", "large"] as const).map((size) => (
+                <button
+                  key={size}
+                  type="button"
+                  onClick={() => update("logoSize", size)}
+                  className={`flex-1 flex flex-col items-center gap-1.5 border rounded-lg py-3 capitalize text-xs font-medium text-plum ${
+                    settings.logoSize === size ? "border-berry ring-1 ring-berry" : "border-cream-soft"
+                  }`}
+                >
+                  <span
+                    className="bg-plum/80 rounded-sm"
+                    style={{
+                      height: size === "small" ? 14 : size === "large" ? 26 : 20,
+                      width: size === "small" ? 28 : size === "large" ? 52 : 40
+                    }}
+                  />
+                  {size}
+                </button>
+              ))}
+            </div>
+          </div>
         </section>
 
         <section className="bg-white border border-cream-soft rounded-xl p-5 space-y-3">

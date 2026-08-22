@@ -185,7 +185,7 @@ export default function AdminProductsPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
         <div>
           <h1 className="text-xl font-medium text-plum">Products</h1>
           <p className="text-sm text-ink-muted">Manage fish listed on the shop.</p>
@@ -287,72 +287,135 @@ export default function AdminProductsPage() {
       {loading ? (
         <p className="text-sm text-ink-muted">Loading products...</p>
       ) : (
-        <div className="bg-white border border-cream-soft rounded-xl overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left text-xs text-ink-muted border-b border-cream-soft">
-                <th className="px-4 py-3 font-medium">Name</th>
-                <th className="px-4 py-3 font-medium">Category</th>
-                <th className="px-4 py-3 font-medium">Stock</th>
-                <th className="px-4 py-3 font-medium">Active</th>
-                <th className="px-4 py-3 font-medium text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {products.map((p) => (
-                <tr key={p.id} className="border-b border-cream-soft last:border-0">
-                  <td className="px-4 py-3 text-plum">{p.name}</td>
-                  <td className="px-4 py-3 text-ink-muted">
+        <>
+          {/* Mobile: stacked cards */}
+          <div className="sm:hidden space-y-3">
+            {products.map((p) => (
+              <div key={p.id} className="bg-white border border-cream-soft rounded-xl p-3">
+                <div className="flex items-start gap-3">
+                  <div className="w-14 h-14 rounded-lg bg-cream-soft flex-shrink-0 overflow-hidden">
+                    {p.image && !p.image.includes("fish-placeholder") && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-plum truncate">{p.name}</p>
                     <a
                       href={`/shop?category=${p.categorySlug}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="hover:text-plum hover:underline"
+                      className="text-xs text-ink-muted hover:text-plum hover:underline"
                     >
                       {p.category}
                     </a>
-                  </td>
-                  <td className="px-4 py-3">
+                  </div>
+                  <div className="flex items-center gap-2 flex-shrink-0">
                     <button
-                      onClick={() => toggleStock(p)}
-                      className="text-xs px-2.5 py-1 rounded-full bg-cream-soft text-ink"
+                      onClick={() => openEditForm(p)}
+                      className="text-ink-muted hover:text-plum p-1"
+                      aria-label={`Edit ${p.name}`}
                     >
-                      {p.stockStatus.replace("_", " ")}
+                      <Pencil size={16} />
                     </button>
-                  </td>
-                  <td className="px-4 py-3">
                     <button
-                      onClick={() => toggleActive(p)}
-                      className={`text-xs px-2.5 py-1 rounded-full ${
-                        p.isActive ? "bg-[#E3F3EF] text-[#1E7A6E]" : "bg-cream-soft text-ink-muted"
-                      }`}
+                      onClick={() => handleDelete(p.id)}
+                      className="text-ink-muted hover:text-[#A32D2D] p-1"
+                      aria-label={`Delete ${p.name}`}
                     >
-                      {p.isActive ? "Active" : "Inactive"}
+                      <Trash2 size={16} />
                     </button>
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <div className="flex items-center justify-end gap-3">
-                      <button
-                        onClick={() => openEditForm(p)}
-                        className="text-ink-muted hover:text-plum"
-                        aria-label={`Edit ${p.name}`}
-                      >
-                        <Pencil size={16} />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(p.id)}
-                        className="text-ink-muted hover:text-[#A32D2D]"
-                        aria-label={`Delete ${p.name}`}
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </td>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 mt-3">
+                  <button
+                    onClick={() => toggleStock(p)}
+                    className="text-xs px-2.5 py-1 rounded-full bg-cream-soft text-ink"
+                  >
+                    {p.stockStatus.replace("_", " ")}
+                  </button>
+                  <button
+                    onClick={() => toggleActive(p)}
+                    className={`text-xs px-2.5 py-1 rounded-full ${
+                      p.isActive ? "bg-[#E3F3EF] text-[#1E7A6E]" : "bg-cream-soft text-ink-muted"
+                    }`}
+                  >
+                    {p.isActive ? "Active" : "Inactive"}
+                  </button>
+                </div>
+              </div>
+            ))}
+            {products.length === 0 && <p className="text-sm text-ink-muted">No products yet.</p>}
+          </div>
+
+          {/* Desktop / tablet: table */}
+          <div className="hidden sm:block bg-white border border-cream-soft rounded-xl overflow-x-auto">
+            <table className="w-full text-sm min-w-[560px]">
+              <thead>
+                <tr className="text-left text-xs text-ink-muted border-b border-cream-soft">
+                  <th className="px-4 py-3 font-medium">Name</th>
+                  <th className="px-4 py-3 font-medium">Category</th>
+                  <th className="px-4 py-3 font-medium">Stock</th>
+                  <th className="px-4 py-3 font-medium">Active</th>
+                  <th className="px-4 py-3 font-medium text-right">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {products.map((p) => (
+                  <tr key={p.id} className="border-b border-cream-soft last:border-0">
+                    <td className="px-4 py-3 text-plum">{p.name}</td>
+                    <td className="px-4 py-3 text-ink-muted">
+                      <a
+                        href={`/shop?category=${p.categorySlug}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:text-plum hover:underline"
+                      >
+                        {p.category}
+                      </a>
+                    </td>
+                    <td className="px-4 py-3">
+                      <button
+                        onClick={() => toggleStock(p)}
+                        className="text-xs px-2.5 py-1 rounded-full bg-cream-soft text-ink"
+                      >
+                        {p.stockStatus.replace("_", " ")}
+                      </button>
+                    </td>
+                    <td className="px-4 py-3">
+                      <button
+                        onClick={() => toggleActive(p)}
+                        className={`text-xs px-2.5 py-1 rounded-full ${
+                          p.isActive ? "bg-[#E3F3EF] text-[#1E7A6E]" : "bg-cream-soft text-ink-muted"
+                        }`}
+                      >
+                        {p.isActive ? "Active" : "Inactive"}
+                      </button>
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <div className="flex items-center justify-end gap-3">
+                        <button
+                          onClick={() => openEditForm(p)}
+                          className="text-ink-muted hover:text-plum"
+                          aria-label={`Edit ${p.name}`}
+                        >
+                          <Pencil size={16} />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(p.id)}
+                          className="text-ink-muted hover:text-[#A32D2D]"
+                          aria-label={`Delete ${p.name}`}
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
     </div>
   );

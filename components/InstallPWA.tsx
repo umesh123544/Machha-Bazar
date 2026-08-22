@@ -3,7 +3,13 @@
 import { useEffect, useState } from "react";
 import { Download, X } from "lucide-react";
 
-export default function InstallPWA() {
+export default function InstallPWA({
+  title = "Install Maccha Bazar",
+  description = "Add the app to your home screen for quick access."
+}: {
+  title?: string;
+  description?: string;
+}) {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [visible, setVisible] = useState(false);
 
@@ -23,8 +29,8 @@ export default function InstallPWA() {
     <div className="fixed bottom-20 sm:bottom-6 left-4 right-4 sm:left-auto sm:right-6 sm:w-80 bg-plum text-cream rounded-xl p-4 shadow-lg z-50 flex items-start gap-3">
       <Download size={20} className="text-amber flex-shrink-0 mt-0.5" />
       <div className="flex-1">
-        <div className="text-sm font-medium">Install Maccha Bazar</div>
-        <p className="text-xs text-cream/60 mt-1">Add the app to your home screen for quick access.</p>
+        <div className="text-sm font-medium">{title}</div>
+        <p className="text-xs text-cream/60 mt-1">{description}</p>
         <button
           onClick={async () => {
             if (deferredPrompt) {
