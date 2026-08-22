@@ -1,34 +1,43 @@
 import type { Config } from "tailwindcss";
 
+function withOpacity(variableName: string) {
+  return ({ opacityValue }: { opacityValue?: string }): string => {
+    if (opacityValue !== undefined) {
+      return `rgb(var(${variableName}) / ${opacityValue})`;
+    }
+    return `rgb(var(${variableName}))`;
+  };
+}
+
 const config: Config = {
   content: ["./app/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}"],
   theme: {
     extend: {
       colors: {
         plum: {
-          DEFAULT: "#2B1B33",
-          light: "#3D2846"
+          DEFAULT: withOpacity("--color-plum"),
+          light: withOpacity("--color-plum-light")
         },
         amber: {
-          DEFAULT: "#F0B84C",
-          dark: "#B5651D"
+          DEFAULT: withOpacity("--color-amber"),
+          dark: withOpacity("--color-amber-dark")
         },
         berry: {
-          DEFAULT: "#D65E8C",
-          dark: "#A34068",
-          text: "#4B1528"
+          DEFAULT: withOpacity("--color-berry"),
+          dark: withOpacity("--color-berry-dark"),
+          text: withOpacity("--color-berry-text")
         },
         cream: {
           DEFAULT: "#FAF6EF",
           soft: "#F0E9DC"
         },
         ink: {
-          DEFAULT: "#2B1B33",
+          DEFAULT: withOpacity("--color-plum"),
           muted: "#7A6C7F"
         }
-      },
+      } as any,
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"]
+        sans: ["var(--font-sans)", "system-ui", "sans-serif"]
       },
       borderRadius: {
         xl2: "20px"
