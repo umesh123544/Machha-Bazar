@@ -5,6 +5,8 @@ import Navbar from "./Navbar";
 import Footer from "./Footer";
 import AnnouncementBar from "./AnnouncementBar";
 import BottomNav from "./BottomNav";
+import CartDrawer from "./CartDrawer";
+import { CartProvider } from "@/lib/cart-context";
 import type { SiteSettings } from "@/lib/types";
 
 export default function SiteChrome({
@@ -22,17 +24,13 @@ export default function SiteChrome({
   }
 
   return (
-    <>
+    <CartProvider>
       <AnnouncementBar />
-      <Navbar
-        whatsappNumber={settings.whatsappNumber}
-        businessName={settings.businessName}
-        logoUrl={settings.logoUrl}
-        logoSize={settings.logoSize}
-      />
+      <Navbar />
       <main className="min-h-screen pb-20 md:pb-0">{children}</main>
       <Footer settings={settings} />
       <BottomNav whatsappNumber={settings.whatsappNumber} />
-    </>
+      <CartDrawer whatsappNumber={settings.whatsappNumber} businessName={settings.businessName} />
+    </CartProvider>
   );
 }

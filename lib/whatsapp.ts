@@ -1,4 +1,5 @@
 import type { Product, VariantOption } from "./types";
+import type { CartItem } from "./cart-context";
 
 export function buildOrderMessage(
   businessName: string,
@@ -11,6 +12,15 @@ export function buildOrderMessage(
 
 export function buildInquiryMessage(businessName: string, productName: string) {
   return `Hello ${businessName}\nI am interested in ${productName}. Is it currently available?`;
+}
+
+export function buildCartOrderMessage(businessName: string, items: CartItem[]) {
+  const lines = items.map(
+    (i, idx) =>
+      `${idx + 1}. ${i.name} (${i.variantName}) x${i.quantity} - Rs. ${i.price * i.quantity}`
+  );
+  const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+  return `Hello ${businessName}\nI would like to order:\n\n${lines.join("\n")}\n\nTotal: Rs. ${total}\n\nMy Name:\nPhone:\nLocation:\nDelivery Address:\n\nPlease confirm availability and delivery charges.`;
 }
 
 export function buildDeliveryCheckMessage() {

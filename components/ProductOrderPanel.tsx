@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { MessageCircle, HelpCircle, Minus, Plus } from "lucide-react";
+import { HelpCircle, Minus, Plus } from "lucide-react";
 import type { Product } from "@/lib/types";
-import { buildOrderMessage, buildInquiryMessage, whatsappLink } from "@/lib/whatsapp";
+import { buildInquiryMessage, whatsappLink } from "@/lib/whatsapp";
+import AddToCartButton from "./AddToCartButton";
 import StockBadge from "./StockBadge";
 
 export default function ProductOrderPanel({
@@ -21,9 +22,6 @@ export default function ProductOrderPanel({
   const variant = product.variants.find((v) => v.id === variantId) || product.variants[0];
   const soldOut = product.stockStatus === "sold_out" || !variant;
 
-  const orderUrl = variant
-    ? whatsappLink(whatsappNumber, buildOrderMessage(businessName, product, variant, quantity))
-    : "#";
   const inquiryUrl = whatsappLink(whatsappNumber, buildInquiryMessage(businessName, product.name));
 
   return (
@@ -91,15 +89,7 @@ export default function ProductOrderPanel({
             Sold Out
           </span>
         ) : (
-          <a
-            href={orderUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex-1 flex items-center justify-center gap-2 bg-berry hover:bg-berry-dark text-berry-text text-sm font-medium rounded-lg py-3 transition-colors"
-          >
-            <MessageCircle size={16} />
-            Order via WhatsApp
-          </a>
+          <AddToCartButton product={product} variant={variant} quantity={quantity} label="Add to Cart" />
         )}
         <a
           href={inquiryUrl}
