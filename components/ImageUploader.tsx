@@ -10,7 +10,7 @@ export default function ImageUploader({
 }: {
   value: string;
   onChange: (url: string) => void;
-  scope: "product" | "banner";
+  scope: "product" | "banner" | "logo";
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
