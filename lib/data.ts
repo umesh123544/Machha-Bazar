@@ -70,10 +70,12 @@ type SettingsRow = {
   delivery_note: string;
   facebook_url: string;
   instagram_url: string;
+  logo_url: string | null;
   banner_image: string | null;
   banner_badge: string | null;
   banner_headline: string | null;
   banner_subheading: string | null;
+  banner_template: string | null;
   homepage_content: HomepageContent | null;
 };
 
@@ -159,10 +161,12 @@ function rowToSettings(r: SettingsRow): SiteSettings {
     deliveryNote: r.delivery_note,
     facebookUrl: r.facebook_url,
     instagramUrl: r.instagram_url,
+    logoUrl: r.logo_url || "",
     bannerImage: r.banner_image || "",
     bannerBadge: r.banner_badge || "Kathmandu Valley delivery",
     bannerHeadline: r.banner_headline || "Bring home something beautiful.",
     bannerSubheading: r.banner_subheading || "Healthy, carefully raised aquarium fish for your home.",
+    bannerTemplate: r.banner_template === "split" ? "split" : "classic",
     homepageContent: r.homepage_content
       ? { ...DEFAULT_HOMEPAGE_CONTENT, ...r.homepage_content }
       : DEFAULT_HOMEPAGE_CONTENT
@@ -183,10 +187,12 @@ function settingsToRow(s: SiteSettings): SettingsRow {
     delivery_note: s.deliveryNote,
     facebook_url: s.facebookUrl,
     instagram_url: s.instagramUrl,
+    logo_url: s.logoUrl || null,
     banner_image: s.bannerImage || null,
     banner_badge: s.bannerBadge || null,
     banner_headline: s.bannerHeadline || null,
     banner_subheading: s.bannerSubheading || null,
+    banner_template: s.bannerTemplate || "classic",
     homepage_content: s.homepageContent || null
   };
 }
