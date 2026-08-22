@@ -1,8 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { SiteSettings } from "@/lib/types";
+import { Plus, Trash2 } from "lucide-react";
+import type { SiteSettings, HomepageWhyItem, HomepageStep } from "@/lib/types";
 import ImageUploader from "@/components/ImageUploader";
+
+const ICON_OPTIONS = ["Egg", "Fish", "Camera", "Truck", "Heart", "ShieldCheck", "Leaf", "Star", "Droplet", "Sparkles"];
 
 export default function AdminSettingsPage() {
   const [settings, setSettings] = useState<SiteSettings | null>(null);
@@ -42,6 +45,46 @@ export default function AdminSettingsPage() {
   function update<K extends keyof SiteSettings>(key: K, value: SiteSettings[K]) {
     if (!settings) return;
     setSettings({ ...settings, [key]: value });
+  }
+
+  function updateHomepage<K extends keyof SiteSettings["homepageContent"]>(
+    key: K,
+    value: SiteSettings["homepageContent"][K]
+  ) {
+    if (!settings) return;
+    setSettings({ ...settings, homepageContent: { ...settings.homepageContent, [key]: value } });
+  }
+
+  function updateWhyItem(index: number, patch: Partial<HomepageWhyItem>) {
+    if (!settings) return;
+    const whyItems = settings.homepageContent.whyItems.map((item, i) => (i === index ? { ...item, ...patch } : item));
+    updateHomepage("whyItems", whyItems);
+  }
+
+  function addWhyItem() {
+    if (!settings) return;
+    updateHomepage("whyItems", [...settings.homepageContent.whyItems, { icon: "Fish", title: "", desc: "" }]);
+  }
+
+  function removeWhyItem(index: number) {
+    if (!settings) return;
+    updateHomepage("whyItems", settings.homepageContent.whyItems.filter((_, i) => i !== index));
+  }
+
+  function updateStep(index: number, patch: Partial<HomepageStep>) {
+    if (!settings) return;
+    const steps = settings.homepageContent.steps.map((step, i) => (i === index ? { ...step, ...patch } : step));
+    updateHomepage("steps", steps);
+  }
+
+  function addStep() {
+    if (!settings) return;
+    updateHomepage("steps", [...settings.homepageContent.steps, { title: "", desc: "" }]);
+  }
+
+  function removeStep(index: number) {
+    if (!settings) return;
+    updateHomepage("steps", settings.homepageContent.steps.filter((_, i) => i !== index));
   }
 
   if (loading || !settings) {
@@ -84,6 +127,166 @@ export default function AdminSettingsPage() {
               onChange={(e) => update("bannerSubheading", e.target.value)}
               className="w-full text-sm rounded-lg border border-cream-soft px-3 py-2.5"
               placeholder="Healthy, carefully raised aquarium fish for your home."
+            />
+          </div>
+        </section>
+
+        <section className="bg-white border border-cream-soft rounded-xl p-5 space-y-5">
+          <h2 className="text-sm font-medium text-plum mb-1">Homepage sections</h2>
+
+          <div>
+            <label className="text-xs text-ink-muted mb-1 block">&quot;Available now&quot; section title</label>
+            <input
+              value={settings.homepageContent.availableTitle}
+              onChange={(e) => updateHomepage("availableTitle", e.target.value)}
+              className="w-full text-sm rounded-lg border border-cream-soft px-3 py-2.5 mb-2"
+            />
+            <label className="text-xs text-ink-muted mb-1 block">Subtitle</label>
+            <input
+              value={settings.homepageContent.availableSubtitle}
+              onChange={(e) => updateHomepage("availableSubtitle", e.target.value)}
+              className="w-full text-sm rounded-lg border border-cream-soft px-3 py-2.5"
+            />
+            <p className="text-[11px] text-ink-muted mt-1">
+              Mark products as &quot;Featured&quot; in Products to control which ones show here.
+            </p>
+          </div>
+
+          <div className="border-t border-cream-soft pt-4">
+            <label className="text-xs text-ink-muted mb-1 block">&quot;Why choose us&quot; title</label>
+            <input
+              value={settings.homepageContent.whyTitle}
+              onChange={(e) => updateHomepage("whyTitle", e.target.value)}
+              className="w-full text-sm rounded-lg border border-cream-soft px-3 py-2.5 mb-3"
+            />
+            <div className="space-y-3">
+              {settings.homepageContent.whyItems.map((item, i) => (
+                <div key={i} className="border border-cream-soft rounded-lg p-3 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={item.icon}
+                      onChange={(e) => updateWhyItem(i, { icon: e.target.value })}
+                      className="text-sm rounded-lg border border-cream-soft px-2 py-2"
+                    >
+                      {ICON_OPTIONS.map((icon) => (
+                        <option key={icon} value={icon}>{icon}</option>
+                      ))}
+                    </select>
+                    <input
+                      value={item.title}
+                      onChange={(e) => updateWhyItem(i, { title: e.target.value })}
+                      placeholder="Title"
+                      className="flex-1 text-sm rounded-lg border border-cream-soft px-3 py-2"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeWhyItem(i)}
+                      className="text-ink-muted hover:text-[#A32D2D] p-1"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                  <textarea
+                    value={item.desc}
+                    onChange={(e) => updateWhyItem(i, { desc: e.target.value })}
+                    placeholder="Description"
+                    rows={2}
+                    className="w-full text-sm rounded-lg border border-cream-soft px-3 py-2"
+                  />
+                </div>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={addWhyItem}
+              className="flex items-center gap-1 text-xs font-medium text-berry-dark mt-2"
+            >
+              <Plus size={14} /> Add item
+            </button>
+          </div>
+
+          <div className="border-t border-cream-soft pt-4">
+            <label className="text-xs text-ink-muted mb-1 block">&quot;How to order&quot; title</label>
+            <input
+              value={settings.homepageContent.howToOrderTitle}
+              onChange={(e) => updateHomepage("howToOrderTitle", e.target.value)}
+              className="w-full text-sm rounded-lg border border-cream-soft px-3 py-2.5 mb-3"
+            />
+            <div className="space-y-3">
+              {settings.homepageContent.steps.map((step, i) => (
+                <div key={i} className="border border-cream-soft rounded-lg p-3 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-ink-muted w-6">{String(i + 1).padStart(2, "0")}</span>
+                    <input
+                      value={step.title}
+                      onChange={(e) => updateStep(i, { title: e.target.value })}
+                      placeholder="Step title"
+                      className="flex-1 text-sm rounded-lg border border-cream-soft px-3 py-2"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeStep(i)}
+                      className="text-ink-muted hover:text-[#A32D2D] p-1"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                  <textarea
+                    value={step.desc}
+                    onChange={(e) => updateStep(i, { desc: e.target.value })}
+                    placeholder="Step description"
+                    rows={2}
+                    className="w-full text-sm rounded-lg border border-cream-soft px-3 py-2"
+                  />
+                </div>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={addStep}
+              className="flex items-center gap-1 text-xs font-medium text-berry-dark mt-2"
+            >
+              <Plus size={14} /> Add step
+            </button>
+          </div>
+
+          <div className="border-t border-cream-soft pt-4">
+            <label className="text-xs text-ink-muted mb-1 block">Delivery section title</label>
+            <input
+              value={settings.homepageContent.deliveryTitle}
+              onChange={(e) => updateHomepage("deliveryTitle", e.target.value)}
+              className="w-full text-sm rounded-lg border border-cream-soft px-3 py-2.5"
+            />
+            <p className="text-[11px] text-ink-muted mt-1">
+              Delivery areas and note are edited in the Delivery section below.
+            </p>
+          </div>
+
+          <div className="border-t border-cream-soft pt-4">
+            <label className="text-xs text-ink-muted mb-1 block">&quot;More coming soon&quot; title</label>
+            <input
+              value={settings.homepageContent.comingSoonTitle}
+              onChange={(e) => updateHomepage("comingSoonTitle", e.target.value)}
+              className="w-full text-sm rounded-lg border border-cream-soft px-3 py-2.5"
+            />
+            <p className="text-[11px] text-ink-muted mt-1">
+              This section auto-fills from categories marked &quot;Coming soon&quot; in Categories.
+            </p>
+          </div>
+
+          <div className="border-t border-cream-soft pt-4">
+            <label className="text-xs text-ink-muted mb-1 block">Bottom call-to-action title</label>
+            <input
+              value={settings.homepageContent.ctaTitle}
+              onChange={(e) => updateHomepage("ctaTitle", e.target.value)}
+              className="w-full text-sm rounded-lg border border-cream-soft px-3 py-2.5 mb-2"
+            />
+            <label className="text-xs text-ink-muted mb-1 block">Call-to-action subtitle</label>
+            <textarea
+              value={settings.homepageContent.ctaSubtitle}
+              onChange={(e) => updateHomepage("ctaSubtitle", e.target.value)}
+              rows={2}
+              className="w-full text-sm rounded-lg border border-cream-soft px-3 py-2.5"
             />
           </div>
         </section>
