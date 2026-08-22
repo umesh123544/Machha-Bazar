@@ -100,7 +100,55 @@ export default function AdminSettingsPage() {
 
       <form onSubmit={handleSave} className="space-y-8">
         <section className="bg-white border border-cream-soft rounded-xl p-5 space-y-3">
+          <h2 className="text-sm font-medium text-plum mb-1">Logo</h2>
+          <p className="text-[11px] text-ink-muted -mt-2 mb-1">
+            Upload a logo to show it instead of the plain business name in the header and footer. Remove the image to fall back to text.
+          </p>
+          <div className="max-w-xs">
+            <ImageUploader value={settings.logoUrl} onChange={(url) => update("logoUrl", url)} scope="logo" />
+          </div>
+        </section>
+
+        <section className="bg-white border border-cream-soft rounded-xl p-5 space-y-3">
           <h2 className="text-sm font-medium text-plum mb-1">Homepage banner</h2>
+          <div>
+            <label className="text-xs text-ink-muted mb-2 block">Banner layout</label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => update("bannerTemplate", "classic")}
+                className={`text-left border rounded-lg p-3 ${
+                  settings.bannerTemplate === "classic" ? "border-berry ring-1 ring-berry" : "border-cream-soft"
+                }`}
+              >
+                <div className="h-14 rounded-md bg-plum mb-2 flex items-center px-2">
+                  <div className="w-2/3 space-y-1">
+                    <div className="h-1.5 w-1/2 bg-amber/70 rounded-full" />
+                    <div className="h-2 w-full bg-cream/80 rounded-full" />
+                  </div>
+                </div>
+                <div className="text-xs font-medium text-plum">Classic</div>
+                <div className="text-[11px] text-ink-muted">Full-width photo with text over a dark overlay.</div>
+              </button>
+              <button
+                type="button"
+                onClick={() => update("bannerTemplate", "split")}
+                className={`text-left border rounded-lg p-3 ${
+                  settings.bannerTemplate === "split" ? "border-berry ring-1 ring-berry" : "border-cream-soft"
+                }`}
+              >
+                <div className="h-14 rounded-md bg-cream-soft mb-2 flex overflow-hidden">
+                  <div className="w-1/2 flex flex-col justify-center gap-1 px-2">
+                    <div className="h-1.5 w-3/4 bg-plum/70 rounded-full" />
+                    <div className="h-2 w-full bg-plum/40 rounded-full" />
+                  </div>
+                  <div className="w-1/2 bg-plum" />
+                </div>
+                <div className="text-xs font-medium text-plum">Split</div>
+                <div className="text-[11px] text-ink-muted">Photo on one side, text on a plain background on the other.</div>
+              </button>
+            </div>
+          </div>
           <ImageUploader value={settings.bannerImage} onChange={(url) => update("bannerImage", url)} scope="banner" />
           <div>
             <label className="text-xs text-ink-muted mb-1 block">Small badge text</label>

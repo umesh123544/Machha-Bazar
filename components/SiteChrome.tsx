@@ -24,7 +24,7 @@ export default function SiteChrome({
   return (
     <>
       <AnnouncementBar />
-      <Navbar whatsappNumber={settings.whatsappNumber} businessName={settings.businessName} />
+      <Navbar whatsappNumber={settings.whatsappNumber} businessName={settings.businessName} logoUrl={settings.logoUrl} />
       <main className="min-h-screen pb-20 md:pb-0">{children}</main>
       <Footer settings={settings} />
       <BottomNav whatsappNumber={settings.whatsappNumber} />

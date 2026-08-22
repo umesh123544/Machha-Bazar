@@ -7,7 +7,12 @@ export default function Footer({ settings }: { settings: SiteSettings }) {
     <footer className="bg-plum text-cream mt-20">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 grid grid-cols-1 sm:grid-cols-3 gap-10">
         <div>
-          <div className="text-lg font-semibold">{settings.businessName}</div>
+          {settings.logoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={settings.logoUrl} alt={settings.businessName} className="h-9 w-auto object-contain mb-1" />
+          ) : (
+            <div className="text-lg font-semibold">{settings.businessName}</div>
+          )}
           <p className="text-sm text-cream/60 mt-2">{settings.tagline}</p>
           <div className="flex items-center gap-4 mt-4">
             <a href={`https://wa.me/${settings.whatsappNumber}`} target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className="text-cream/70 hover:text-amber">
