@@ -391,3 +391,122 @@ export async function getAllPageContent(): Promise<PageContent[]> {
     updatedAt: r.updated_at,
   }));
 }
+
+
+// ---- customers ----
+
+type CustomerRow = {
+  id: string;
+  name: string;
+  phone: string;
+  email: string;
+  password_hash: string;
+  address: string;
+  delivery_area: string;
+  notes: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export type Customer = {
+  id: string;
+  name: string;
+  phone: string;
+  email: string;
+  address: string;
+  deliveryArea: string;
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+function rowToCustomer(r: CustomerRow): Customer {
+  return {
+    id: r.id,
+    name: r.name,
+    phone: r.phone,
+    email: r.email,
+    address: r.address,
+    deliveryArea: r.delivery_area,
+    notes: r.notes,
+    createdAt: r.created_at,
+    updatedAt: r.updated_at
+  };
+}
+
+export async function getCustomerByEmail(
+  email: string
+): Promise<(Customer & { passwordHash: string }) | null> {
+  const { data, error } = await supabaseAdmin
+    .from("customers")
+    .select("*")
+    .eq("email", email.toLowerCase().trim())
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) return null;
+  const row = data as CustomerRow;
+  return { ...rowToCustomer(row), passwordHash: row.password_hash };
+}
+
+export async function getCustomerById(id: string): Promise<Customer | null> {
+  const { data, error } = await supabaseAdmin.from("customers").select("*").eq("id", id).maybeSingle();
+  if (error) throw error;
+  if (!data) return null;
+  return rowToCustomer(data as CustomerRow);
+}
+
+export async function createCustomer(input: {
+  name: string;
+  phone: string;
+  email: string;
+  passwordHash: string;
+  address?: string;
+  deliveryArea?: string;
+}): Promise<Customer> {
+  const now = new Date().toISOString();
+  const row = {
+    id: `c${Date.now()}`,
+    name: input.name.trim(),
+    phone: input.phone.trim(),
+    email: input.email.toLowerCase().trim(),
+    password_hash: input.passwordHash,
+    address: input.address?.trim() || "",
+    delivery_area: input.deliveryArea?.trim() || "",
+    notes: "",
+    created_at: now,
+    updated_at: now
+  };
+  const { data, error } = await supabaseAdmin.from("customers").insert(row).select().single();
+  if (error) throw error;
+  return rowToCustomer(data as CustomerRow);
+}
+
+export async function updateCustomer(
+  id: string,
+  patch: Partial<{
+    name: string;
+    phone: string;
+    address: string;
+    deliveryArea: string;
+    notes: string;
+  }>
+): Promise<Customer | null> {
+  const existing = await getCustomerById(id);
+  if (!existing) return null;
+  const row = {
+    name: patch.name !== undefined ? patch.name.trim() : existing.name,
+    phone: patch.phone !== undefined ? patch.phone.trim() : existing.phone,
+    address: patch.address !== undefined ? patch.address.trim() : existing.address,
+    delivery_area: patch.deliveryArea !== undefined ? patch.deliveryArea.trim() : existing.deliveryArea,
+    notes: patch.notes !== undefined ? patch.notes.trim() : existing.notes,
+    updated_at: new Date().toISOString()
+  };
+  const { data, error } = await supabaseAdmin
+    .from("customers")
+    .update(row)
+    .eq("id", id)
+    .select()
+    .single();
+  if (error) throw error;
+  return rowToCustomer(data as CustomerRow);
+}
