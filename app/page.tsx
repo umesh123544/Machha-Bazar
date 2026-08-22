@@ -1,11 +1,25 @@
 import Link from "next/link";
-import { MessageCircle, Egg, Camera, Truck, Fish } from "lucide-react";
+import { MessageCircle, Egg, Camera, Truck, Fish, Heart, ShieldCheck, Leaf, Star, Droplet, Sparkles } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { getActiveProducts, getCategories, getSiteSettings } from "@/lib/data";
 import ProductCard from "@/components/ProductCard";
 import InstallPWA from "@/components/InstallPWA";
 import { whatsappLink, buildInquiryMessage } from "@/lib/whatsapp";
 
 export const dynamic = "force-dynamic";
+
+const ICON_MAP: Record<string, LucideIcon> = {
+  Egg,
+  Fish,
+  Camera,
+  Truck,
+  Heart,
+  ShieldCheck,
+  Leaf,
+  Star,
+  Droplet,
+  Sparkles
+};
 
 export default async function HomePage() {
   const products = await getActiveProducts();
@@ -14,20 +28,7 @@ export default async function HomePage() {
   const categories = await getCategories();
   const comingSoon = categories.filter((c) => c.comingSoon);
   const settings = await getSiteSettings();
-
-  const steps = [
-    { n: "01", title: "Choose your fish", desc: "Browse available fish." },
-    { n: "02", title: "Send your order", desc: "Message us through WhatsApp." },
-    { n: "03", title: "Confirm details", desc: "We confirm availability, price and delivery." },
-    { n: "04", title: "Receive your fish", desc: "Get your fish delivered safely." }
-  ];
-
-  const why = [
-    { icon: Egg, title: "Home bred", desc: "Fish are raised with care in a controlled home environment." },
-    { icon: Fish, title: "Carefully raised", desc: "We focus on maintaining healthy fish and proper aquarium conditions." },
-    { icon: Camera, title: "Real fish photos", desc: "We use actual product photos whenever possible." },
-    { icon: Truck, title: "Valley delivery", desc: "Convenient live fish delivery inside Kathmandu Valley." }
-  ];
+  const content = settings.homepageContent;
 
   return (
     <div>
@@ -72,8 +73,8 @@ export default async function HomePage() {
       <section className="max-w-6xl mx-auto px-4 sm:px-6 pb-16">
         <div className="flex items-end justify-between mb-6">
           <div>
-            <h2 className="text-xl sm:text-2xl font-medium text-plum">Available now</h2>
-            <p className="text-sm text-ink-muted">Explore our currently available aquarium fish.</p>
+            <h2 className="text-xl sm:text-2xl font-medium text-plum">{content.availableTitle}</h2>
+            <p className="text-sm text-ink-muted">{content.availableSubtitle}</p>
           </div>
           <Link href="/shop" className="text-sm text-berry-dark font-medium hidden sm:block">
             See all
@@ -88,25 +89,28 @@ export default async function HomePage() {
 
       <section className="bg-cream-soft py-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <h2 className="text-xl sm:text-2xl font-medium text-plum mb-8 text-center">Why choose Maccha Bazar</h2>
+          <h2 className="text-xl sm:text-2xl font-medium text-plum mb-8 text-center">{content.whyTitle}</h2>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
-            {why.map((item) => (
-              <div key={item.title} className="bg-white rounded-xl p-5 text-center border border-cream-soft">
-                <item.icon className="mx-auto mb-3 text-berry-dark" size={22} />
-                <div className="text-sm font-medium text-plum mb-1">{item.title}</div>
-                <p className="text-xs text-ink-muted">{item.desc}</p>
-              </div>
-            ))}
+            {content.whyItems.map((item, i) => {
+              const Icon = ICON_MAP[item.icon] || Fish;
+              return (
+                <div key={i} className="bg-white rounded-xl p-5 text-center border border-cream-soft">
+                  <Icon className="mx-auto mb-3 text-berry-dark" size={22} />
+                  <div className="text-sm font-medium text-plum mb-1">{item.title}</div>
+                  <p className="text-xs text-ink-muted">{item.desc}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
 
       <section className="max-w-6xl mx-auto px-4 sm:px-6 py-16">
-        <h2 className="text-xl sm:text-2xl font-medium text-plum mb-8 text-center">How to order</h2>
+        <h2 className="text-xl sm:text-2xl font-medium text-plum mb-8 text-center">{content.howToOrderTitle}</h2>
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-6">
-          {steps.map((step) => (
-            <div key={step.n}>
-              <div className="text-2xl font-medium text-amber-dark mb-2">{step.n}</div>
+          {content.steps.map((step, i) => (
+            <div key={i}>
+              <div className="text-2xl font-medium text-amber-dark mb-2">{String(i + 1).padStart(2, "0")}</div>
               <div className="text-sm font-medium text-plum mb-1">{step.title}</div>
               <p className="text-xs text-ink-muted">{step.desc}</p>
             </div>
@@ -116,7 +120,7 @@ export default async function HomePage() {
 
       <section className="bg-plum py-14">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <h2 className="text-lg sm:text-xl font-medium text-cream mb-6 text-center">Safe live fish delivery</h2>
+          <h2 className="text-lg sm:text-xl font-medium text-cream mb-6 text-center">{content.deliveryTitle}</h2>
           <p className="text-sm text-cream/60 text-center max-w-lg mx-auto mb-6">
             We currently provide live fish delivery inside Kathmandu Valley, covering {settings.deliveryAreas.join(", ")}.
             {" "}{settings.deliveryNote}
@@ -130,7 +134,7 @@ export default async function HomePage() {
       </section>
 
       <section className="max-w-6xl mx-auto px-4 sm:px-6 py-16">
-        <h2 className="text-xl sm:text-2xl font-medium text-plum mb-8 text-center">More coming soon</h2>
+        <h2 className="text-xl sm:text-2xl font-medium text-plum mb-8 text-center">{content.comingSoonTitle}</h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {comingSoon.map((cat) => (
             <div key={cat.id} className="bg-white rounded-xl border border-cream-soft p-5 text-center">
@@ -144,9 +148,9 @@ export default async function HomePage() {
       </section>
 
       <section className="bg-cream-soft py-16 text-center px-4">
-        <h2 className="text-xl sm:text-2xl font-medium text-plum mb-2">Looking for a specific fish?</h2>
+        <h2 className="text-xl sm:text-2xl font-medium text-plum mb-2">{content.ctaTitle}</h2>
         <p className="text-sm text-ink-muted mb-6 max-w-md mx-auto">
-          Can&apos;t find what you&apos;re looking for? Message us and ask about current availability.
+          {content.ctaSubtitle}
         </p>
         <a
           href={whatsappLink(settings.whatsappNumber, buildInquiryMessage(settings.businessName, "a specific fish"))}
