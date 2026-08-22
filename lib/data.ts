@@ -267,6 +267,12 @@ export async function getActiveProducts(): Promise<Product[]> {
   return products.filter((p) => p.isActive && !p.isComingSoon);
 }
 
+export async function getProductById(id: string): Promise<Product | undefined> {
+  const { data, error } = await supabaseAdmin.from("products").select("*").eq("id", id).maybeSingle();
+  if (error) throw error;
+  return data ? rowToProduct(data as ProductRow) : undefined;
+}
+
 export async function getProductBySlug(slug: string): Promise<Product | undefined> {
   const { data, error } = await supabaseAdmin.from("products").select("*").eq("slug", slug).maybeSingle();
   if (error) throw error;
@@ -664,4 +670,151 @@ export async function getCustomerOrderCounts(): Promise<Record<string, number>> 
     if (id) counts[id] = (counts[id] || 0) + 1;
   }
   return counts;
+}
+
+// ---- product comments (reviews) ----
+
+type ProductCommentRow = {
+  id: string;
+  product_id: string;
+  customer_id: string;
+  customer_name: string;
+  customer_avatar: string | null;
+  rating: number;
+  comment: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ProductComment = {
+  id: string;
+  productId: string;
+  customerId: string;
+  customerName: string;
+  customerAvatar: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+function rowToProductComment(r: ProductCommentRow): ProductComment {
+  return {
+    id: r.id,
+    productId: r.product_id,
+    customerId: r.customer_id,
+    customerName: r.customer_name,
+    customerAvatar: r.customer_avatar || "",
+    rating: r.rating,
+    comment: r.comment,
+    createdAt: r.created_at,
+    updatedAt: r.updated_at
+  };
+}
+
+export async function getCommentsByProductId(productId: string): Promise<ProductComment[]> {
+  const { data, error } = await supabaseAdmin
+    .from("product_comments")
+    .select("*")
+    .eq("product_id", productId)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data as ProductCommentRow[]).map(rowToProductComment);
+}
+
+export async function getCommentByCustomerForProduct(
+  productId: string,
+  customerId: string
+): Promise<ProductComment | null> {
+  const { data, error } = await supabaseAdmin
+    .from("product_comments")
+    .select("*")
+    .eq("product_id", productId)
+    .eq("customer_id", customerId)
+    .maybeSingle();
+  if (error) throw error;
+  return data ? rowToProductComment(data as ProductCommentRow) : null;
+}
+
+export async function addProductComment(input: {
+  productId: string;
+  customerId: string;
+  customerName: string;
+  customerAvatar?: string;
+  rating: number;
+  comment: string;
+}): Promise<ProductComment> {
+  const now = new Date().toISOString();
+  const row = {
+    id: `cm${Date.now()}${Math.random().toString(36).slice(2, 7)}`,
+    product_id: input.productId,
+    customer_id: input.customerId,
+    customer_name: input.customerName,
+    customer_avatar: input.customerAvatar || "",
+    rating: Math.min(5, Math.max(1, Math.round(input.rating))),
+    comment: input.comment.trim(),
+    created_at: now,
+    updated_at: now
+  };
+  const { data, error } = await supabaseAdmin.from("product_comments").insert(row).select().single();
+  if (error) throw error;
+  return rowToProductComment(data as ProductCommentRow);
+}
+
+export async function updateProductComment(
+  id: string,
+  customerId: string,
+  patch: { rating: number; comment: string }
+): Promise<ProductComment | null> {
+  const { data, error } = await supabaseAdmin
+    .from("product_comments")
+    .update({
+      rating: Math.min(5, Math.max(1, Math.round(patch.rating))),
+      comment: patch.comment.trim(),
+      updated_at: new Date().toISOString()
+    })
+    .eq("id", id)
+    .eq("customer_id", customerId)
+    .select()
+    .maybeSingle();
+  if (error) throw error;
+  return data ? rowToProductComment(data as ProductCommentRow) : null;
+}
+
+export async function deleteProductComment(id: string, customerId?: string): Promise<void> {
+  let query = supabaseAdmin.from("product_comments").delete().eq("id", id);
+  if (customerId) query = query.eq("customer_id", customerId);
+  const { error } = await query;
+  if (error) throw error;
+}
+
+export async function getAllProductComments(limit = 300): Promise<ProductComment[]> {
+  const { data, error } = await supabaseAdmin
+    .from("product_comments")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  if (error) throw error;
+  return (data as ProductCommentRow[]).map(rowToProductComment);
+}
+
+export async function getCommentStatsByProduct(): Promise<
+  Record<string, { count: number; avgRating: number }>
+> {
+  const { data, error } = await supabaseAdmin.from("product_comments").select("product_id, rating");
+  if (error) throw error;
+  const totals: Record<string, { count: number; total: number }> = {};
+  for (const row of (data || []) as { product_id: string; rating: number }[]) {
+    if (!totals[row.product_id]) totals[row.product_id] = { count: 0, total: 0 };
+    totals[row.product_id].count += 1;
+    totals[row.product_id].total += row.rating;
+  }
+  const result: Record<string, { count: number; avgRating: number }> = {};
+  for (const pid of Object.keys(totals)) {
+    result[pid] = {
+      count: totals[pid].count,
+      avgRating: Math.round((totals[pid].total / totals[pid].count) * 10) / 10
+    };
+  }
+  return result;
 }
