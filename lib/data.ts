@@ -1,5 +1,5 @@
 import { supabaseAdmin } from "./supabaseClient";
-import type { Product, Category, SiteSettings, AdminUser, AdminPermissions, HomepageContent } from "./types";
+import type { Product, Category, SiteSettings, AdminUser, AdminPermissions, HomepageContent, BannerSlide } from "./types";
 
 // ---- row <-> app-type mapping ----
 
@@ -76,6 +76,11 @@ type SettingsRow = {
   banner_headline: string | null;
   banner_subheading: string | null;
   banner_template: string | null;
+  banner_slides: BannerSlide[] | null;
+  primary_color: string | null;
+  accent_color: string | null;
+  highlight_color: string | null;
+  site_font: string | null;
   homepage_content: HomepageContent | null;
 };
 
@@ -166,7 +171,14 @@ function rowToSettings(r: SettingsRow): SiteSettings {
     bannerBadge: r.banner_badge || "Kathmandu Valley delivery",
     bannerHeadline: r.banner_headline || "Bring home something beautiful.",
     bannerSubheading: r.banner_subheading || "Healthy, carefully raised aquarium fish for your home.",
-    bannerTemplate: r.banner_template === "split" ? "split" : "classic",
+    bannerTemplate: (["classic", "split", "centered", "card", "gradient", "carousel"].includes(r.banner_template || "")
+      ? r.banner_template
+      : "classic") as SiteSettings["bannerTemplate"],
+    bannerSlides: Array.isArray(r.banner_slides) ? r.banner_slides.slice(0, 5) : [],
+    primaryColor: r.primary_color || "#2B1B33",
+    accentColor: r.accent_color || "#D65E8C",
+    highlightColor: r.highlight_color || "#F0B84C",
+    siteFont: r.site_font || "Inter",
     homepageContent: r.homepage_content
       ? { ...DEFAULT_HOMEPAGE_CONTENT, ...r.homepage_content }
       : DEFAULT_HOMEPAGE_CONTENT
@@ -193,6 +205,11 @@ function settingsToRow(s: SiteSettings): SettingsRow {
     banner_headline: s.bannerHeadline || null,
     banner_subheading: s.bannerSubheading || null,
     banner_template: s.bannerTemplate || "classic",
+    banner_slides: s.bannerSlides || [],
+    primary_color: s.primaryColor || null,
+    accent_color: s.accentColor || null,
+    highlight_color: s.highlightColor || null,
+    site_font: s.siteFont || null,
     homepage_content: s.homepageContent || null
   };
 }
