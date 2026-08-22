@@ -6,6 +6,7 @@ import ProductCard from "@/components/ProductCard";
 import InstallPWA from "@/components/InstallPWA";
 import BannerCarousel from "@/components/BannerCarousel";
 import BannerSingle from "@/components/BannerSingle";
+import OfferBanner from "@/components/OfferBanner";
 import { whatsappLink, buildInquiryMessage } from "@/lib/whatsapp";
 
 export const dynamic = "force-dynamic";
