@@ -12,14 +12,27 @@ const links = [
   { href: "/contact", label: "Contact" }
 ];
 
-export default function Navbar({ whatsappNumber, businessName }: { whatsappNumber: string; businessName: string }) {
+export default function Navbar({
+  whatsappNumber,
+  businessName,
+  logoUrl
+}: {
+  whatsappNumber: string;
+  businessName: string;
+  logoUrl?: string;
+}) {
   const [open, setOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-40 bg-cream/95 backdrop-blur border-b border-cream-soft">
       <div className="max-w-6xl mx-auto flex items-center justify-between px-4 sm:px-6 h-16">
-        <Link href="/" className="text-lg font-semibold text-plum tracking-tight">
-          {businessName}
+        <Link href="/" className="flex items-center gap-2 text-lg font-semibold text-plum tracking-tight">
+          {logoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={logoUrl} alt={businessName} className="h-9 w-auto object-contain" />
+          ) : (
+            businessName
+          )}
         </Link>
 
         <nav className="hidden md:flex items-center gap-8">
