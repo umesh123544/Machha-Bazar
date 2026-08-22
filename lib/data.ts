@@ -407,6 +407,7 @@ type CustomerRow = {
   created_at: string;
   updated_at: string;
   last_login_at: string | null;
+  avatar_url: string | null;
 };
 
 export type Customer = {
@@ -420,6 +421,7 @@ export type Customer = {
   createdAt: string;
   updatedAt: string;
   lastLoginAt: string | null;
+  avatarUrl: string;
 };
 
 function rowToCustomer(r: CustomerRow): Customer {
@@ -433,7 +435,8 @@ function rowToCustomer(r: CustomerRow): Customer {
     notes: r.notes,
     createdAt: r.created_at,
     updatedAt: r.updated_at,
-    lastLoginAt: r.last_login_at || null
+    lastLoginAt: r.last_login_at || null,
+    avatarUrl: r.avatar_url || ""
   };
 }
 
@@ -492,6 +495,7 @@ export async function updateCustomer(
     address: string;
     deliveryArea: string;
     notes: string;
+    avatarUrl: string;
   }>
 ): Promise<Customer | null> {
   const existing = await getCustomerById(id);
@@ -502,6 +506,7 @@ export async function updateCustomer(
     address: patch.address !== undefined ? patch.address.trim() : existing.address,
     delivery_area: patch.deliveryArea !== undefined ? patch.deliveryArea.trim() : existing.deliveryArea,
     notes: patch.notes !== undefined ? patch.notes.trim() : existing.notes,
+    avatar_url: patch.avatarUrl !== undefined ? patch.avatarUrl : existing.avatarUrl,
     updated_at: new Date().toISOString()
   };
   const { data, error } = await supabaseAdmin

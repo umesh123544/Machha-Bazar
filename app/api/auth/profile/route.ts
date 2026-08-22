@@ -17,7 +17,8 @@ export async function PUT(request: NextRequest) {
       phone: body.phone,
       address: body.address,
       deliveryArea: body.deliveryArea,
-      notes: body.notes
+      notes: body.notes,
+      avatarUrl: body.avatarUrl
     });
     if (!updated) {
       return NextResponse.json({ success: false, message: "Account not found." }, { status: 404 });
@@ -31,7 +32,8 @@ export async function PUT(request: NextRequest) {
         phone: updated.phone,
         address: updated.address,
         deliveryArea: updated.deliveryArea,
-        notes: updated.notes
+        notes: updated.notes,
+        avatarUrl: updated.avatarUrl || ""
       }
     });
   } catch (err) {

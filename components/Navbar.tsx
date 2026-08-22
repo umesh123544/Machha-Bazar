@@ -6,7 +6,9 @@ import { User, ShoppingCart } from "lucide-react";
 import GlobalSearch from "./GlobalSearch";
 import { useCart } from "@/lib/cart-context";
 
-type MeCustomer = { name: string; email: string } | null;
+type MeCustomer = { name: string; email: string; avatarUrl?: string } | null;
+
+const DEFAULT_AVATAR = "/avatars/default-1.svg";
 
 export default function Navbar() {
   const { totalItems, openCart } = useCart();
@@ -17,12 +19,36 @@ export default function Navbar() {
       .then((r) => r.json())
       .then((data) => {
         if (data.customer) {
-          setCustomer({ name: data.customer.name, email: data.customer.email });
+          setCustomer({
+            name: data.customer.name,
+            email: data.customer.email,
+            avatarUrl: data.customer.avatarUrl || ""
+          });
         } else {
           setCustomer(null);
         }
       })
       .catch(() => setCustomer(null));
+
+    // refresh avatar when returning from account page
+    const onFocus = () => {
+      fetch("/api/auth/me")
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.customer) {
+            setCustomer({
+              name: data.customer.name,
+              email: data.customer.email,
+              avatarUrl: data.customer.avatarUrl || ""
+            });
+          } else {
+            setCustomer(null);
+          }
+        })
+        .catch(() => {});
+    };
+    window.addEventListener("focus", onFocus);
+    return () => window.removeEventListener("focus", onFocus);
   }, []);
 
   return (
@@ -30,16 +56,24 @@ export default function Navbar() {
       <div className="max-w-6xl mx-auto flex items-center gap-2 sm:gap-4 px-3 sm:px-6 h-16">
         <Link
           href="/account"
-          className="flex-shrink-0 flex items-center gap-1.5 text-plum hover:text-berry-dark"
+          className="flex-shrink-0 flex items-center text-plum hover:opacity-80"
           aria-label={customer ? "My account" : "Log in or sign up"}
         >
-          <User size={22} />
-          <span className="hidden sm:inline text-xs font-medium max-w-[100px] truncate">
-            {customer ? customer.name || "Account" : "Login / Sign up"}
-          </span>
-          <span className="sm:hidden text-[10px] font-medium">
-            {customer ? "Account" : "Login"}
-          </span>
+          {customer ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={customer.avatarUrl || DEFAULT_AVATAR}
+              alt=""
+              className="w-9 h-9 rounded-full object-cover border-2 border-berry/40 bg-cream-soft"
+            />
+          ) : (
+            <span className="flex items-center gap-1.5">
+              <span className="w-9 h-9 rounded-full border border-cream-soft bg-white flex items-center justify-center">
+                <User size={18} />
+              </span>
+              <span className="hidden sm:inline text-xs font-medium">Login</span>
+            </span>
+          )}
         </Link>
 
         <div className="flex-1 flex justify-center min-w-0">

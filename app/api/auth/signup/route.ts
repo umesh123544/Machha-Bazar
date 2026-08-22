@@ -69,7 +69,8 @@ export async function POST(request: NextRequest) {
         phone: customer.phone,
         address: customer.address,
         deliveryArea: customer.deliveryArea,
-        notes: customer.notes
+        notes: customer.notes,
+        avatarUrl: customer.avatarUrl || ""
       }
     });
     response.cookies.set(getCustomerSessionCookieName(), token, {

@@ -21,7 +21,8 @@ export async function GET() {
       phone: customer.phone,
       address: customer.address,
       deliveryArea: customer.deliveryArea,
-      notes: customer.notes
+      notes: customer.notes,
+      avatarUrl: customer.avatarUrl || ""
     }
   });
 }

@@ -14,6 +14,7 @@ type Customer = {
   createdAt: string;
   lastLoginAt: string | null;
   orderCount: number;
+  avatarUrl?: string;
 };
 
 type OrderItem = {
@@ -142,9 +143,14 @@ export default function AdminCustomersPage() {
                     onClick={() => setExpandedId(open ? null : c.id)}
                     className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-cream-soft/40"
                   >
-                    <div className="w-9 h-9 rounded-full bg-plum/10 text-plum flex items-center justify-center text-sm font-medium flex-shrink-0">
-                      {(c.name || c.email || "?").charAt(0).toUpperCase()}
-                    </div>
+                    {c.avatarUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={c.avatarUrl} alt="" className="w-9 h-9 rounded-full object-cover flex-shrink-0 bg-cream-soft" />
+                    ) : (
+                      <div className="w-9 h-9 rounded-full bg-plum/10 text-plum flex items-center justify-center text-sm font-medium flex-shrink-0">
+                        {(c.name || c.email || "?").charAt(0).toUpperCase()}
+                      </div>
+                    )}
                     <div className="flex-1 min-w-0">
                       <div className="text-sm font-medium text-plum truncate">
                         {c.name || "No name"}
