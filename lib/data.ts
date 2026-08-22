@@ -11,7 +11,8 @@ export const DEFAULT_OFFER: OfferSettings = {
   ctaText: "Shop the offer",
   ctaLink: "/shop",
   endsAt: "",
-  image: ""
+  image: "",
+  template: "gradient"
 };
 
 export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {

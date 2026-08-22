@@ -13,8 +13,18 @@ const DEFAULT: OfferSettings = {
   ctaText: "Shop the offer",
   ctaLink: "/shop",
   endsAt: "",
-  image: ""
+  image: "",
+  template: "gradient"
 };
+
+const TEMPLATE_OPTIONS: { key: OfferSettings["template"]; label: string; desc: string }[] = [
+  { key: "gradient", label: "Gradient", desc: "Rich dark gradient card with countdown + photo." },
+  { key: "minimal", label: "Minimal", desc: "Clean light card, no heavy decoration." },
+  { key: "ribbon", label: "Ribbon", desc: "Bold diagonal corner ribbon, playful sale look." },
+  { key: "split", label: "Split", desc: "Photo one side, offer details the other." },
+  { key: "ticket", label: "Ticket", desc: "Coupon-style with a dashed perforated divider." },
+  { key: "bar", label: "Bar", desc: "Slim inline strip — least intrusive." }
+];
 
 const DURATION_PRESETS = [
   { label: "1 दिन (1 day)", days: 1 },
@@ -149,6 +159,25 @@ export default function AdminOffersPage() {
               End time is already past — banner will stay hidden until you extend the time.
             </p>
           )}
+
+          <div>
+            <label className="text-xs text-ink-muted mb-2 block">Banner style</label>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {TEMPLATE_OPTIONS.map((opt) => (
+                <button
+                  key={opt.key}
+                  type="button"
+                  onClick={() => update("template", opt.key)}
+                  className={`text-left border rounded-lg p-2.5 ${
+                    offer.template === opt.key ? "border-berry ring-1 ring-berry" : "border-cream-soft"
+                  }`}
+                >
+                  <div className="text-xs font-medium text-plum">{opt.label}</div>
+                  <div className="text-[10px] text-ink-muted leading-snug mt-0.5">{opt.desc}</div>
+                </button>
+              ))}
+            </div>
+          </div>
 
           <div>
             <label className="text-xs text-ink-muted mb-1 block">Badge (small label)</label>

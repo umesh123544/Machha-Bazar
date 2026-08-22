@@ -79,6 +79,7 @@ export type OfferSettings = {
   ctaLink: string;
   endsAt: string;
   image: string;
+  template: "gradient" | "minimal" | "ribbon" | "split" | "ticket" | "bar";
 };
 
 export type SiteSettings = {

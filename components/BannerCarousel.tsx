@@ -47,6 +47,8 @@ export default function BannerCarousel({
   function handleTouchEnd(e: React.TouchEvent) {
     if (touchStartX.current === null) return;
     const dx = e.changedTouches[0].clientX - touchStartX.current;
+    // Swipe left (finger moves right-to-left) -> go to next slide.
+    // Swipe right (finger moves left-to-right) -> go to previous slide.
     if (Math.abs(dx) > 40) {
       goTo(index + (dx < 0 ? 1 : -1));
       restartTimer();
@@ -58,50 +60,58 @@ export default function BannerCarousel({
 
   return (
     <div
-      className="relative rounded-2xl overflow-hidden"
+      className="relative rounded-2xl overflow-hidden border border-cream-soft"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      {slides.map((slide, i) => (
-        <div
-          key={slide.id}
-          aria-hidden={i !== index}
-          className={`bg-plum px-6 sm:px-12 py-14 sm:py-20 relative overflow-hidden bg-cover bg-center transition-opacity duration-500 ${
-            i === index ? "opacity-100 relative" : "opacity-0 absolute inset-0 pointer-events-none"
-          }`}
-          style={slide.image ? { backgroundImage: `linear-gradient(rgba(45,20,45,0.72), rgba(45,20,45,0.72)), url(${slide.image})` } : undefined}
-        >
-          {slide.badge && (
-            <span className="inline-block text-xs font-medium text-amber bg-amber/10 px-3 py-1.5 rounded-full mb-5">
-              {slide.badge}
-            </span>
-          )}
-          <h1 className="text-3xl sm:text-5xl font-medium text-cream leading-tight max-w-xl mb-4">
-            {slide.headline}
-          </h1>
-          {slide.subheading && (
-            <p className="text-sm sm:text-base text-cream/60 max-w-md mb-8">{slide.subheading}</p>
-          )}
-          <div className="flex flex-wrap gap-3">
-            <Link
-              href="/shop"
-              className="bg-berry hover:bg-berry-dark text-berry-text text-sm font-medium px-6 py-3 rounded-lg transition-colors"
-            >
-              Shop Available Fish
-            </Link>
-            <a
-              href={`https://wa.me/${whatsappNumber}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 border border-cream/25 text-cream text-sm font-medium px-6 py-3 rounded-lg hover:bg-cream/5 transition-colors"
-            >
-              <MessageCircle size={16} />
-              Chat on WhatsApp
-            </a>
+      <div
+        className="flex transition-transform duration-500 ease-out"
+        style={{ transform: `translateX(-${index * 100}%)` }}
+      >
+        {slides.map((slide) => (
+          <div key={slide.id} className="w-full flex-shrink-0">
+            <div className="grid grid-cols-1 sm:grid-cols-2">
+              {/* Text: left */}
+              <div className="bg-cream-soft px-6 sm:px-10 py-14 sm:py-20 flex flex-col justify-center order-2 sm:order-1">
+                {slide.badge && (
+                  <span className="inline-block text-xs font-medium text-berry-dark bg-berry/10 px-3 py-1.5 rounded-full mb-5 w-fit">
+                    {slide.badge}
+                  </span>
+                )}
+                <h1 className="text-3xl sm:text-4xl font-medium text-plum leading-tight mb-4">{slide.headline}</h1>
+                {slide.subheading && (
+                  <p className="text-sm sm:text-base text-ink-muted max-w-md mb-8">{slide.subheading}</p>
+                )}
+                <div className="flex flex-wrap gap-3">
+                  <Link
+                    href="/shop"
+                    className="bg-berry hover:bg-berry-dark text-berry-text text-sm font-medium px-6 py-3 rounded-lg transition-colors"
+                  >
+                    Shop Available Fish
+                  </Link>
+                  <a
+                    href={`https://wa.me/${whatsappNumber}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 border border-plum/20 text-plum text-sm font-medium px-6 py-3 rounded-lg hover:bg-plum/5 transition-colors"
+                  >
+                    <MessageCircle size={16} />
+                    Chat on WhatsApp
+                  </a>
+                </div>
+              </div>
+
+              {/* Image: right */}
+              <div
+                className="bg-plum min-h-[220px] sm:min-h-0 bg-cover bg-center order-1 sm:order-2 relative overflow-hidden"
+                style={slide.image ? { backgroundImage: `url(${slide.image})` } : undefined}
+              >
+                {!slide.image && <Fish className="absolute inset-0 m-auto text-amber/10" size={180} aria-hidden />}
+              </div>
+            </div>
           </div>
-          {!slide.image && <Fish className="absolute -right-4 -bottom-6 text-amber/5" size={260} aria-hidden />}
-        </div>
-      ))}
+        ))}
+      </div>
 
       {count > 1 && (
         <>
@@ -111,7 +121,7 @@ export default function BannerCarousel({
               goTo(index - 1);
               restartTimer();
             }}
-            className="hidden sm:flex items-center justify-center absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-cream/15 text-cream hover:bg-cream/25 backdrop-blur-sm transition-colors"
+            className="hidden sm:flex items-center justify-center absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-plum/15 text-plum hover:bg-plum/25 backdrop-blur-sm transition-colors"
           >
             <ChevronLeft size={18} />
           </button>
@@ -121,7 +131,7 @@ export default function BannerCarousel({
               goTo(index + 1);
               restartTimer();
             }}
-            className="hidden sm:flex items-center justify-center absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-cream/15 text-cream hover:bg-cream/25 backdrop-blur-sm transition-colors"
+            className="hidden sm:flex items-center justify-center absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-plum/15 text-plum hover:bg-plum/25 backdrop-blur-sm transition-colors"
           >
             <ChevronRight size={18} />
           </button>
@@ -135,7 +145,7 @@ export default function BannerCarousel({
                   restartTimer();
                 }}
                 className={`h-1.5 rounded-full transition-all ${
-                  i === index ? "w-6 bg-cream" : "w-1.5 bg-cream/40"
+                  i === index ? "w-6 bg-plum" : "w-1.5 bg-plum/30"
                 }`}
               />
             ))}
