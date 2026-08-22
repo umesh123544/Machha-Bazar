@@ -2,6 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --color-plum: 43 27 51;
+  --color-plum-light: 61 40 70;
+  --color-berry: 214 94 140;
+  --color-berry-dark: 163 64 104;
+  --color-berry-text: 75 21 40;
+  --color-amber: 240 184 76;
+  --color-amber-dark: 181 101 29;
+  --font-sans: "Inter", system-ui, sans-serif;
+}
+
 html {
   scroll-behavior: smooth;
 }
