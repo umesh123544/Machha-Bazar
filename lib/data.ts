@@ -1,7 +1,30 @@
 import { supabaseAdmin } from "./supabaseClient";
-import type { Product, Category, SiteSettings, AdminUser, AdminPermissions } from "./types";
+import type { Product, Category, SiteSettings, AdminUser, AdminPermissions, HomepageContent } from "./types";
 
 // ---- row <-> app-type mapping ----
+
+export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
+  availableTitle: "Available now",
+  availableSubtitle: "Explore our currently available aquarium fish.",
+  whyTitle: "Why choose Maccha Bazar",
+  whyItems: [
+    { icon: "Egg", title: "Home bred", desc: "Fish are raised with care in a controlled home environment." },
+    { icon: "Fish", title: "Carefully raised", desc: "We focus on maintaining healthy fish and proper aquarium conditions." },
+    { icon: "Camera", title: "Real fish photos", desc: "We use actual product photos whenever possible." },
+    { icon: "Truck", title: "Valley delivery", desc: "Convenient live fish delivery inside Kathmandu Valley." }
+  ],
+  howToOrderTitle: "How to order",
+  steps: [
+    { title: "Choose your fish", desc: "Browse available fish." },
+    { title: "Send your order", desc: "Message us through WhatsApp." },
+    { title: "Confirm details", desc: "We confirm availability, price and delivery." },
+    { title: "Receive your fish", desc: "Get your fish delivered safely." }
+  ],
+  deliveryTitle: "Safe live fish delivery",
+  comingSoonTitle: "More coming soon",
+  ctaTitle: "Looking for a specific fish?",
+  ctaSubtitle: "Can't find what you're looking for? Message us and ask about current availability."
+};
 
 type ProductRow = {
   id: string;
@@ -51,6 +74,7 @@ type SettingsRow = {
   banner_badge: string | null;
   banner_headline: string | null;
   banner_subheading: string | null;
+  homepage_content: HomepageContent | null;
 };
 
 type AdminUserRow = {
@@ -138,7 +162,10 @@ function rowToSettings(r: SettingsRow): SiteSettings {
     bannerImage: r.banner_image || "",
     bannerBadge: r.banner_badge || "Kathmandu Valley delivery",
     bannerHeadline: r.banner_headline || "Bring home something beautiful.",
-    bannerSubheading: r.banner_subheading || "Healthy, carefully raised aquarium fish for your home."
+    bannerSubheading: r.banner_subheading || "Healthy, carefully raised aquarium fish for your home.",
+    homepageContent: r.homepage_content
+      ? { ...DEFAULT_HOMEPAGE_CONTENT, ...r.homepage_content }
+      : DEFAULT_HOMEPAGE_CONTENT
   };
 }
 
@@ -159,7 +186,8 @@ function settingsToRow(s: SiteSettings): SettingsRow {
     banner_image: s.bannerImage || null,
     banner_badge: s.bannerBadge || null,
     banner_headline: s.bannerHeadline || null,
-    banner_subheading: s.bannerSubheading || null
+    banner_subheading: s.bannerSubheading || null,
+    homepage_content: s.homepageContent || null
   };
 }
 
