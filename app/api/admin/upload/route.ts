@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: "No file provided." }, { status: 400 });
   }
 
-  const permissionKey: keyof AdminPermissions = scope === "banner" ? "content" : "products";
+  const permissionKey: keyof AdminPermissions = scope === "banner" || scope === "logo" ? "content" : "products";
   const admin = await requirePermission(permissionKey);
   if (!admin) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
   }
 
   const buffer = Buffer.from(await file.arrayBuffer());
-  const folder = scope === "banner" ? "banner" : "products";
+  const folder = scope === "banner" ? "banner" : scope === "logo" ? "logo" : "products";
 
   try {
     const url = await uploadImage(buffer, file.name, file.type, folder);
