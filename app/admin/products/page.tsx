@@ -14,6 +14,7 @@ type FormState = {
   size: string;
   stockStatus: StockStatus;
   isActive: boolean;
+  isFeatured: boolean;
   isComingSoon: boolean;
   price: number;
   image: string;
@@ -28,6 +29,7 @@ const emptyForm: FormState = {
   size: "",
   stockStatus: "in_stock",
   isActive: true,
+  isFeatured: false,
   isComingSoon: false,
   price: 0,
   image: ""
@@ -90,6 +92,7 @@ export default function AdminProductsPage() {
       size: product.size,
       stockStatus: product.stockStatus,
       isActive: product.isActive,
+      isFeatured: product.isFeatured,
       isComingSoon: product.isComingSoon,
       price: product.variants[0]?.price || 0,
       image: product.image && !product.image.includes("fish-placeholder") ? product.image : ""
@@ -129,6 +132,7 @@ export default function AdminProductsPage() {
       size: form.size,
       stockStatus: form.stockStatus,
       isActive: form.isActive,
+      isFeatured: form.isFeatured,
       isComingSoon: form.isComingSoon,
       image: form.image || undefined,
       galleryImages: form.image ? [form.image] : undefined,
@@ -264,6 +268,14 @@ export default function AdminProductsPage() {
               onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
             />
             Active (visible on the shop)
+          </label>
+          <label className="flex items-center gap-2 text-sm text-ink-muted">
+            <input
+              type="checkbox"
+              checked={form.isFeatured}
+              onChange={(e) => setForm({ ...form, isFeatured: e.target.checked })}
+            />
+            Featured (show on homepage &quot;Available now&quot; section)
           </label>
           {error && <p className="text-xs text-[#A32D2D]">{error}</p>}
           <button type="submit" className="bg-plum text-cream text-sm font-medium px-4 py-2 rounded-lg">

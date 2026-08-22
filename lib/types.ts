@@ -38,6 +38,30 @@ export type Category = {
   sortOrder: number;
 };
 
+export type HomepageWhyItem = {
+  icon: string;
+  title: string;
+  desc: string;
+};
+
+export type HomepageStep = {
+  title: string;
+  desc: string;
+};
+
+export type HomepageContent = {
+  availableTitle: string;
+  availableSubtitle: string;
+  whyTitle: string;
+  whyItems: HomepageWhyItem[];
+  howToOrderTitle: string;
+  steps: HomepageStep[];
+  deliveryTitle: string;
+  comingSoonTitle: string;
+  ctaTitle: string;
+  ctaSubtitle: string;
+};
+
 export type SiteSettings = {
   businessName: string;
   tagline: string;
@@ -54,6 +78,7 @@ export type SiteSettings = {
   bannerBadge: string;
   bannerHeadline: string;
   bannerSubheading: string;
+  homepageContent: HomepageContent;
 };
 
 export type AdminPermissions = {
