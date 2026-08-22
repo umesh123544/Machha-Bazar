@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import {
-  createCustomerSessionToken,
-  getCustomerSessionCookieName
-} from "@/lib/customer-auth";
 import { createCustomer, getCustomerByEmail } from "@/lib/data";
+import { findCountry, isValidPhoneForCountry, onlyDigits } from "@/lib/countries";
+import { generateOtp, hashOtp, VERIFICATION_TTL_MS } from "@/lib/otp";
+import { sendVerificationEmail } from "@/lib/email";
 
 export const dynamic = "force-dynamic";
 
@@ -12,13 +11,12 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const name = String(body.name || "").trim();
-    const phone = String(body.phone || "").trim();
+    const phoneRaw = String(body.phone || "").trim();
+    const countryCode = String(body.countryCode || "NP").trim();
     const email = String(body.email || "").trim().toLowerCase();
     const password = String(body.password || "");
-    const address = String(body.address || "").trim();
-    const deliveryArea = String(body.deliveryArea || "").trim();
 
-    if (!name || !phone || !email || !password) {
+    if (!name || !phoneRaw || !email || !password) {
       return NextResponse.json(
         { success: false, message: "Name, phone, email and password are required." },
         { status: 400 }
@@ -37,6 +35,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const country = findCountry(countryCode);
+    const phoneDigits = onlyDigits(phoneRaw);
+    if (!isValidPhoneForCountry(phoneDigits, countryCode)) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: `Enter a valid ${country.name} phone number (${country.digits} digits, no country code).`
+        },
+        { status: 400 }
+      );
+    }
+
     const existing = await getCustomerByEmail(email);
     if (existing) {
       return NextResponse.json(
@@ -46,41 +56,38 @@ export async function POST(request: NextRequest) {
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
+    const code = generateOtp();
+    const codeHash = hashOtp(code, email);
+    const expiresAt = new Date(Date.now() + VERIFICATION_TTL_MS).toISOString();
+
     const customer = await createCustomer({
       name,
-      phone,
+      phone: phoneDigits,
+      phoneCountryCode: country.dial,
       email,
       passwordHash,
-      address,
-      deliveryArea
+      verificationCodeHash: codeHash,
+      verificationExpiresAt: expiresAt
     });
 
-    const token = createCustomerSessionToken({
-      customerId: customer.id,
-      email: customer.email,
-      name: customer.name
-    });
-    const response = NextResponse.json({
+    try {
+      await sendVerificationEmail(customer.email, code, customer.name);
+    } catch {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Account created but we couldn't send the verification email. Please try resending it."
+        },
+        { status: 502 }
+      );
+    }
+
+    // No session cookie yet — the account isn't usable until the email is verified.
+    return NextResponse.json({
       success: true,
-      customer: {
-        id: customer.id,
-        name: customer.name,
-        email: customer.email,
-        phone: customer.phone,
-        address: customer.address,
-        deliveryArea: customer.deliveryArea,
-        notes: customer.notes,
-        avatarUrl: customer.avatarUrl || ""
-      }
+      needsVerification: true,
+      email: customer.email
     });
-    response.cookies.set(getCustomerSessionCookieName(), token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 30
-    });
-    return response;
   } catch (err) {
     console.error("signup error", err);
     return NextResponse.json(

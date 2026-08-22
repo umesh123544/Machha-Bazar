@@ -19,6 +19,7 @@ export async function GET() {
       name: customer.name,
       email: customer.email,
       phone: customer.phone,
+      phoneCountryCode: customer.phoneCountryCode,
       address: customer.address,
       deliveryArea: customer.deliveryArea,
       notes: customer.notes,

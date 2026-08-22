@@ -422,6 +422,7 @@ type CustomerRow = {
   id: string;
   name: string;
   phone: string;
+  phone_country_code: string | null;
   email: string;
   password_hash: string;
   address: string;
@@ -431,12 +432,17 @@ type CustomerRow = {
   updated_at: string;
   last_login_at: string | null;
   avatar_url: string | null;
+  email_verified: boolean | null;
+  verification_code_hash: string | null;
+  verification_expires_at: string | null;
+  verification_sent_at: string | null;
 };
 
 export type Customer = {
   id: string;
   name: string;
   phone: string;
+  phoneCountryCode: string;
   email: string;
   address: string;
   deliveryArea: string;
@@ -445,6 +451,7 @@ export type Customer = {
   updatedAt: string;
   lastLoginAt: string | null;
   avatarUrl: string;
+  emailVerified: boolean;
 };
 
 function rowToCustomer(r: CustomerRow): Customer {
@@ -452,6 +459,7 @@ function rowToCustomer(r: CustomerRow): Customer {
     id: r.id,
     name: r.name,
     phone: r.phone,
+    phoneCountryCode: r.phone_country_code || "+977",
     email: r.email,
     address: r.address,
     deliveryArea: r.delivery_area,
@@ -459,7 +467,8 @@ function rowToCustomer(r: CustomerRow): Customer {
     createdAt: r.created_at,
     updatedAt: r.updated_at,
     lastLoginAt: r.last_login_at || null,
-    avatarUrl: r.avatar_url || ""
+    avatarUrl: r.avatar_url || "",
+    emailVerified: !!r.email_verified
   };
 }
 
@@ -487,27 +496,98 @@ export async function getCustomerById(id: string): Promise<Customer | null> {
 export async function createCustomer(input: {
   name: string;
   phone: string;
+  phoneCountryCode?: string;
   email: string;
   passwordHash: string;
   address?: string;
   deliveryArea?: string;
+  verificationCodeHash?: string;
+  verificationExpiresAt?: string;
 }): Promise<Customer> {
   const now = new Date().toISOString();
   const row = {
     id: `c${Date.now()}`,
     name: input.name.trim(),
     phone: input.phone.trim(),
+    phone_country_code: input.phoneCountryCode || "+977",
     email: input.email.toLowerCase().trim(),
     password_hash: input.passwordHash,
     address: input.address?.trim() || "",
     delivery_area: input.deliveryArea?.trim() || "",
     notes: "",
     created_at: now,
-    updated_at: now
+    updated_at: now,
+    email_verified: false,
+    verification_code_hash: input.verificationCodeHash || null,
+    verification_expires_at: input.verificationExpiresAt || null,
+    verification_sent_at: now
   };
   const { data, error } = await supabaseAdmin.from("customers").insert(row).select().single();
   if (error) throw error;
   return rowToCustomer(data as CustomerRow);
+}
+
+// ---- email verification ----
+
+export async function setCustomerVerificationCode(
+  email: string,
+  codeHash: string,
+  expiresAt: string
+): Promise<void> {
+  const { error } = await supabaseAdmin
+    .from("customers")
+    .update({
+      verification_code_hash: codeHash,
+      verification_expires_at: expiresAt,
+      verification_sent_at: new Date().toISOString()
+    })
+    .eq("email", email.toLowerCase().trim());
+  if (error) throw error;
+}
+
+export async function getCustomerVerificationState(email: string): Promise<{
+  id: string;
+  emailVerified: boolean;
+  verificationCodeHash: string | null;
+  verificationExpiresAt: string | null;
+  verificationSentAt: string | null;
+  name: string;
+} | null> {
+  const { data, error } = await supabaseAdmin
+    .from("customers")
+    .select("id, email_verified, verification_code_hash, verification_expires_at, verification_sent_at, name")
+    .eq("email", email.toLowerCase().trim())
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) return null;
+  const row = data as {
+    id: string;
+    email_verified: boolean | null;
+    verification_code_hash: string | null;
+    verification_expires_at: string | null;
+    verification_sent_at: string | null;
+    name: string;
+  };
+  return {
+    id: row.id,
+    emailVerified: !!row.email_verified,
+    verificationCodeHash: row.verification_code_hash,
+    verificationExpiresAt: row.verification_expires_at,
+    verificationSentAt: row.verification_sent_at,
+    name: row.name
+  };
+}
+
+export async function markCustomerEmailVerified(email: string): Promise<void> {
+  const { error } = await supabaseAdmin
+    .from("customers")
+    .update({
+      email_verified: true,
+      verification_code_hash: null,
+      verification_expires_at: null
+    })
+    .eq("email", email.toLowerCase().trim());
+  if (error) throw error;
 }
 
 export async function updateCustomer(
@@ -515,6 +595,7 @@ export async function updateCustomer(
   patch: Partial<{
     name: string;
     phone: string;
+    phoneCountryCode: string;
     address: string;
     deliveryArea: string;
     notes: string;
@@ -526,6 +607,8 @@ export async function updateCustomer(
   const row = {
     name: patch.name !== undefined ? patch.name.trim() : existing.name,
     phone: patch.phone !== undefined ? patch.phone.trim() : existing.phone,
+    phone_country_code:
+      patch.phoneCountryCode !== undefined ? patch.phoneCountryCode.trim() : existing.phoneCountryCode,
     address: patch.address !== undefined ? patch.address.trim() : existing.address,
     delivery_area: patch.deliveryArea !== undefined ? patch.deliveryArea.trim() : existing.deliveryArea,
     notes: patch.notes !== undefined ? patch.notes.trim() : existing.notes,

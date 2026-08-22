@@ -37,6 +37,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (!user.emailVerified) {
+      return NextResponse.json(
+        {
+          success: false,
+          needsVerification: true,
+          email: user.email,
+          message: "Please verify your email before logging in."
+        },
+        { status: 403 }
+      );
+    }
+
     await touchCustomerLogin(user.id);
 
     const token = createCustomerSessionToken({

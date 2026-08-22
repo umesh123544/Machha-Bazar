@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCurrentCustomer } from "@/lib/customer-auth";
 import { updateCustomer } from "@/lib/data";
+import { findCountry, isValidPhoneForCountry, onlyDigits } from "@/lib/countries";
 
 export const dynamic = "force-dynamic";
 
@@ -12,9 +13,28 @@ export async function PUT(request: NextRequest) {
 
   try {
     const body = await request.json();
+
+    let phone = body.phone;
+    let phoneCountryCode = body.countryCode ? findCountry(body.countryCode).dial : undefined;
+    if (phone !== undefined && body.countryCode) {
+      const country = findCountry(body.countryCode);
+      const digits = onlyDigits(String(phone));
+      if (!isValidPhoneForCountry(digits, body.countryCode)) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: `Enter a valid ${country.name} phone number (${country.digits} digits, no country code).`
+          },
+          { status: 400 }
+        );
+      }
+      phone = digits;
+    }
+
     const updated = await updateCustomer(session.customerId, {
       name: body.name,
-      phone: body.phone,
+      phone,
+      phoneCountryCode,
       address: body.address,
       deliveryArea: body.deliveryArea,
       notes: body.notes,
@@ -30,6 +50,7 @@ export async function PUT(request: NextRequest) {
         name: updated.name,
         email: updated.email,
         phone: updated.phone,
+        phoneCountryCode: updated.phoneCountryCode,
         address: updated.address,
         deliveryArea: updated.deliveryArea,
         notes: updated.notes,
