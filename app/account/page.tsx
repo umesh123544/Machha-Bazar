@@ -670,8 +670,9 @@ export default function AccountPage() {
     return (
       <div className="max-w-md mx-auto px-4 sm:px-6 py-12">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-full bg-plum/10 flex items-center justify-center mx-auto mb-4">
-            <User size={28} className="text-plum" />
+          <div className="w-16 h-16 rounded-full bg-plum flex items-center justify-center mx-auto mb-4 overflow-hidden">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/icons/icon-192.png" alt="Maccha Bazar" className="w-10 h-10 object-contain" />
           </div>
           <h1 className="text-2xl font-medium text-plum mb-1">
             {mode === "login" ? "Welcome back" : "Join Maccha Bazar"}
