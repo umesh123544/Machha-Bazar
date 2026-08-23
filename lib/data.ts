@@ -503,6 +503,7 @@ export async function createCustomer(input: {
   deliveryArea?: string;
   verificationCodeHash?: string;
   verificationExpiresAt?: string;
+  emailVerified?: boolean; // true for admin-created customers (skip OTP)
 }): Promise<Customer> {
   const now = new Date().toISOString();
   const row = {
@@ -517,7 +518,7 @@ export async function createCustomer(input: {
     notes: "",
     created_at: now,
     updated_at: now,
-    email_verified: false,
+    email_verified: !!input.emailVerified,
     verification_code_hash: input.verificationCodeHash || null,
     verification_expires_at: input.verificationExpiresAt || null,
     verification_sent_at: now
@@ -525,6 +526,75 @@ export async function createCustomer(input: {
   const { data, error } = await supabaseAdmin.from("customers").insert(row).select().single();
   if (error) throw error;
   return rowToCustomer(data as CustomerRow);
+}
+
+export async function deleteCustomer(id: string): Promise<void> {
+  const { error } = await supabaseAdmin.from("customers").delete().eq("id", id);
+  if (error) throw error;
+}
+
+// ---- forgot / reset password ----
+
+export async function setCustomerResetCode(
+  email: string,
+  codeHash: string,
+  expiresAt: string
+): Promise<boolean> {
+  const { data, error } = await supabaseAdmin
+    .from("customers")
+    .update({
+      reset_code_hash: codeHash,
+      reset_expires_at: expiresAt,
+      reset_sent_at: new Date().toISOString()
+    })
+    .eq("email", email.toLowerCase().trim())
+    .select("id")
+    .maybeSingle();
+  if (error) throw error;
+  return !!data;
+}
+
+export async function getCustomerResetState(email: string): Promise<{
+  id: string;
+  name: string;
+  resetCodeHash: string | null;
+  resetExpiresAt: string | null;
+  resetSentAt: string | null;
+} | null> {
+  const { data, error } = await supabaseAdmin
+    .from("customers")
+    .select("id, name, reset_code_hash, reset_expires_at, reset_sent_at")
+    .eq("email", email.toLowerCase().trim())
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) return null;
+  const row = data as {
+    id: string;
+    name: string;
+    reset_code_hash: string | null;
+    reset_expires_at: string | null;
+    reset_sent_at: string | null;
+  };
+  return {
+    id: row.id,
+    name: row.name,
+    resetCodeHash: row.reset_code_hash,
+    resetExpiresAt: row.reset_expires_at,
+    resetSentAt: row.reset_sent_at
+  };
+}
+
+export async function resetCustomerPassword(email: string, passwordHash: string): Promise<void> {
+  const { error } = await supabaseAdmin
+    .from("customers")
+    .update({
+      password_hash: passwordHash,
+      reset_code_hash: null,
+      reset_expires_at: null,
+      updated_at: new Date().toISOString()
+    })
+    .eq("email", email.toLowerCase().trim());
+  if (error) throw error;
 }
 
 // ---- email verification ----

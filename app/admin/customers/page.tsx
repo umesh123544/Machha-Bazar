@@ -1,13 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Users, ShoppingBag, ChevronDown, ChevronUp, Phone, Mail, MapPin } from "lucide-react";
+import { Users, ShoppingBag, ChevronDown, ChevronUp, Phone, Mail, MapPin, Plus, Trash2, X } from "lucide-react";
+import { COUNTRIES, DEFAULT_COUNTRY, findCountry, onlyDigits } from "@/lib/countries";
 
 type Customer = {
   id: string;
   name: string;
   phone: string;
   email: string;
+  emailVerified?: boolean;
   address: string;
   deliveryArea: string;
   notes: string;
@@ -57,8 +59,19 @@ export default function AdminCustomersPage() {
   const [error, setError] = useState("");
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [tab, setTab] = useState<"customers" | "orders">("customers");
+  const [showAdd, setShowAdd] = useState(false);
+  const [addBusy, setAddBusy] = useState(false);
+  const [addError, setAddError] = useState("");
+  const [addName, setAddName] = useState("");
+  const [addEmail, setAddEmail] = useState("");
+  const [addPassword, setAddPassword] = useState("");
+  const [addPhone, setAddPhone] = useState("");
+  const [addCountryCode, setAddCountryCode] = useState(DEFAULT_COUNTRY.code);
+  const [addAddress, setAddAddress] = useState("");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  useEffect(() => {
+  function loadCustomers() {
+    setLoading(true);
     fetch("/api/admin/customers")
       .then(async (res) => {
         if (!res.ok) {
@@ -76,7 +89,69 @@ export default function AdminCustomersPage() {
         setError(err.message || "Could not load customers.");
         setLoading(false);
       });
+  }
+
+  useEffect(() => {
+    loadCustomers();
   }, []);
+
+  async function handleAddCustomer(e: React.FormEvent) {
+    e.preventDefault();
+    setAddError("");
+    setAddBusy(true);
+    try {
+      const res = await fetch("/api/admin/customers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: addName,
+          email: addEmail,
+          password: addPassword,
+          phone: addPhone,
+          countryCode: addCountryCode,
+          address: addAddress
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setAddError(data.message || "Could not add customer.");
+        setAddBusy(false);
+        return;
+      }
+      setShowAdd(false);
+      setAddName("");
+      setAddEmail("");
+      setAddPassword("");
+      setAddPhone("");
+      setAddAddress("");
+      setAddCountryCode(DEFAULT_COUNTRY.code);
+      loadCustomers();
+    } catch {
+      setAddError("Network error. Please try again.");
+    }
+    setAddBusy(false);
+  }
+
+  async function handleDeleteCustomer(id: string, name: string) {
+    if (!confirm(`Delete customer "${name || "this customer"}"? This cannot be undone.`)) return;
+    setDeletingId(id);
+    try {
+      const res = await fetch(`/api/admin/customers?id=${encodeURIComponent(id)}`, {
+        method: "DELETE"
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        alert(data.message || "Could not delete customer.");
+        setDeletingId(null);
+        return;
+      }
+      setCustomers((prev) => prev.filter((c) => c.id !== id));
+      if (expandedId === id) setExpandedId(null);
+    } catch {
+      alert("Network error. Please try again.");
+    }
+    setDeletingId(null);
+  }
 
   if (loading) {
     return <p className="text-sm text-ink-muted">Loading customers...</p>;
@@ -97,12 +172,111 @@ export default function AdminCustomersPage() {
 
   return (
     <div className="max-w-4xl">
-      <div className="mb-6">
-        <h1 className="text-xl font-medium text-plum">Customers</h1>
-        <p className="text-sm text-ink-muted">
-          Who signed up, their contact details, and WhatsApp order activity.
-        </p>
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-xl font-medium text-plum">Customers</h1>
+          <p className="text-sm text-ink-muted">
+            Who signed up, their contact details, and WhatsApp order activity.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => setShowAdd(true)}
+          className="flex items-center gap-1.5 text-sm px-4 py-2 rounded-full bg-plum text-cream flex-shrink-0"
+        >
+          <Plus size={14} />
+          Add customer
+        </button>
       </div>
+
+      {showAdd && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-lg max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-medium text-plum">Add customer</h2>
+              <button type="button" onClick={() => setShowAdd(false)} className="text-ink-muted">
+                <X size={18} />
+              </button>
+            </div>
+            <form onSubmit={handleAddCustomer} className="space-y-3">
+              <div>
+                <label className="text-xs text-ink-muted mb-1 block">Full name</label>
+                <input
+                  required
+                  value={addName}
+                  onChange={(e) => setAddName(e.target.value)}
+                  className="w-full text-sm rounded-xl border border-cream-soft px-3.5 py-2.5"
+                />
+              </div>
+              <div>
+                <label className="text-xs text-ink-muted mb-1 block">Email</label>
+                <input
+                  type="email"
+                  required
+                  value={addEmail}
+                  onChange={(e) => setAddEmail(e.target.value)}
+                  className="w-full text-sm rounded-xl border border-cream-soft px-3.5 py-2.5"
+                />
+              </div>
+              <div>
+                <label className="text-xs text-ink-muted mb-1 block">Password</label>
+                <input
+                  type="password"
+                  required
+                  minLength={6}
+                  value={addPassword}
+                  onChange={(e) => setAddPassword(e.target.value)}
+                  className="w-full text-sm rounded-xl border border-cream-soft px-3.5 py-2.5"
+                  placeholder="At least 6 characters"
+                />
+              </div>
+              <div>
+                <label className="text-xs text-ink-muted mb-1 block">Phone (optional)</label>
+                <div className="flex gap-2">
+                  <select
+                    value={addCountryCode}
+                    onChange={(e) => setAddCountryCode(e.target.value)}
+                    className="text-sm rounded-xl border border-cream-soft px-2 py-2.5 bg-white"
+                  >
+                    {COUNTRIES.map((c) => (
+                      <option key={c.code} value={c.code}>
+                        {c.flag} {c.dial}
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    inputMode="numeric"
+                    value={addPhone}
+                    onChange={(e) =>
+                      setAddPhone(onlyDigits(e.target.value).slice(0, findCountry(addCountryCode).digits))
+                    }
+                    className="flex-1 min-w-0 text-sm rounded-xl border border-cream-soft px-3.5 py-2.5"
+                    placeholder={"9".repeat(findCountry(addCountryCode).digits)}
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="text-xs text-ink-muted mb-1 block">Address (optional)</label>
+                <input
+                  value={addAddress}
+                  onChange={(e) => setAddAddress(e.target.value)}
+                  className="w-full text-sm rounded-xl border border-cream-soft px-3.5 py-2.5"
+                />
+              </div>
+
+              {addError && <p className="text-sm text-[#A32D2D]">{addError}</p>}
+
+              <button
+                type="submit"
+                disabled={addBusy}
+                className="w-full bg-plum text-cream text-sm font-medium py-3 rounded-xl disabled:opacity-60 mt-1"
+              >
+                {addBusy ? "Adding..." : "Add customer"}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
 
       <div className="flex gap-2 mb-5">
         <button
@@ -152,8 +326,17 @@ export default function AdminCustomersPage() {
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium text-plum truncate">
+                      <div className="text-sm font-medium text-plum truncate flex items-center gap-1.5">
                         {c.name || "No name"}
+                        {c.emailVerified ? (
+                          <span className="text-[10px] font-normal px-1.5 py-0.5 rounded-full bg-[#1E7A6E]/10 text-[#1E7A6E] flex-shrink-0">
+                            Verified
+                          </span>
+                        ) : (
+                          <span className="text-[10px] font-normal px-1.5 py-0.5 rounded-full bg-[#A32D2D]/10 text-[#A32D2D] flex-shrink-0">
+                            Not verified
+                          </span>
+                        )}
                       </div>
                       <div className="text-xs text-ink-muted truncate">
                         {c.email}
@@ -200,6 +383,17 @@ export default function AdminCustomersPage() {
                         <span>
                           Orders: {c.orderCount}
                         </span>
+                      </div>
+                      <div className="pt-2">
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteCustomer(c.id, c.name)}
+                          disabled={deletingId === c.id}
+                          className="flex items-center gap-1.5 text-xs text-[#A32D2D] font-medium px-3 py-1.5 rounded-lg border border-[#A32D2D]/30 hover:bg-[#A32D2D]/5 disabled:opacity-50"
+                        >
+                          <Trash2 size={13} />
+                          {deletingId === c.id ? "Deleting..." : "Delete customer"}
+                        </button>
                       </div>
                       {c.orderCount > 0 && (
                         <div className="pt-2 space-y-2">

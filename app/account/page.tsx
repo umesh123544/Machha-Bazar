@@ -65,7 +65,7 @@ export default function AccountPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [view, setView] = useState<"dashboard" | "profile">("dashboard");
-  const [mode, setMode] = useState<"login" | "signup" | "verify">("login");
+  const [mode, setMode] = useState<"login" | "signup" | "verify" | "forgot" | "reset">("login");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
@@ -83,6 +83,11 @@ export default function AccountPage() {
   const [verifyEmail, setVerifyEmail] = useState("");
   const [resendCooldown, setResendCooldown] = useState(0);
 
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [resetCode, setResetCode] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [resetCooldown, setResetCooldown] = useState(0);
+
   const [profileName, setProfileName] = useState("");
   const [profilePhone, setProfilePhone] = useState("");
   const [profileCountryCode, setProfileCountryCode] = useState(DEFAULT_COUNTRY.code);
@@ -96,6 +101,12 @@ export default function AccountPage() {
     const t = setTimeout(() => setResendCooldown((s) => s - 1), 1000);
     return () => clearTimeout(t);
   }, [resendCooldown]);
+
+  useEffect(() => {
+    if (resetCooldown <= 0) return;
+    const t = setTimeout(() => setResetCooldown((s) => s - 1), 1000);
+    return () => clearTimeout(t);
+  }, [resetCooldown]);
 
   useEffect(() => {
     loadMe();
@@ -255,6 +266,88 @@ export default function AccountPage() {
     } catch {
       setError("Network error. Please try again.");
     }
+  }
+
+  async function handleForgotPassword(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    setMessage("");
+    setAuthBusy(true);
+    try {
+      const res = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: forgotEmail })
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setError(data.message || "Could not send reset code.");
+        setAuthBusy(false);
+        return;
+      }
+      setMode("reset");
+      setResetCooldown(45);
+      setMessage("If an account exists for that email, we've sent a reset code.");
+    } catch {
+      setError("Network error. Please try again.");
+    }
+    setAuthBusy(false);
+  }
+
+  async function handleResendReset() {
+    if (resetCooldown > 0) return;
+    setError("");
+    setMessage("");
+    try {
+      const res = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: forgotEmail })
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setError(data.message || "Could not resend code.");
+        return;
+      }
+      setMessage("A new reset code has been sent.");
+      setResetCooldown(45);
+    } catch {
+      setError("Network error. Please try again.");
+    }
+  }
+
+  async function handleResetPassword(e: React.FormEvent) {
+    e.preventDefault();
+    setError("");
+    setMessage("");
+    if (newPassword.length < 6) {
+      setError("Password must be at least 6 characters.");
+      return;
+    }
+    setAuthBusy(true);
+    try {
+      const res = await fetch("/api/auth/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: forgotEmail, code: resetCode, newPassword })
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setError(data.message || "Could not reset password.");
+        setAuthBusy(false);
+        return;
+      }
+      setMode("login");
+      setEmail(forgotEmail);
+      setPassword("");
+      setResetCode("");
+      setNewPassword("");
+      setForgotEmail("");
+      setMessage("Password reset. Please log in with your new password.");
+    } catch {
+      setError("Network error. Please try again.");
+    }
+    setAuthBusy(false);
   }
 
   async function handleSaveProfile(e: React.FormEvent) {
@@ -431,6 +524,147 @@ export default function AccountPage() {
       );
     }
 
+    if (mode === "forgot") {
+      return (
+        <div className="max-w-md mx-auto px-4 sm:px-6 py-12">
+          <div className="text-center mb-8">
+            <div className="w-16 h-16 rounded-full bg-plum/10 flex items-center justify-center mx-auto mb-4">
+              <User size={28} className="text-plum" />
+            </div>
+            <h1 className="text-2xl font-medium text-plum mb-1">Reset your password</h1>
+            <p className="text-sm text-ink-muted">
+              Enter your account email and we&apos;ll send you a reset code.
+            </p>
+          </div>
+
+          <form
+            onSubmit={handleForgotPassword}
+            className="bg-white border border-cream-soft rounded-2xl p-6 shadow-sm space-y-3"
+          >
+            <div>
+              <label className="text-xs text-ink-muted mb-1 block">Email</label>
+              <input
+                type="email"
+                required
+                value={forgotEmail}
+                onChange={(e) => setForgotEmail(e.target.value)}
+                className="w-full text-sm rounded-xl border border-cream-soft px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-berry/30"
+                placeholder="you@email.com"
+              />
+            </div>
+
+            {error && <p className="text-sm text-[#A32D2D]">{error}</p>}
+            {message && <p className="text-sm text-[#1E7A6E]">{message}</p>}
+
+            <button
+              type="submit"
+              disabled={authBusy}
+              className="w-full bg-plum text-cream text-sm font-medium py-3 rounded-xl disabled:opacity-60 mt-1"
+            >
+              {authBusy ? "Sending..." : "Send reset code"}
+            </button>
+          </form>
+
+          <p className="text-center text-sm text-ink-muted mt-5">
+            <button
+              type="button"
+              onClick={() => {
+                setMode("login");
+                setError("");
+                setMessage("");
+              }}
+              className="text-ink-muted underline"
+            >
+              Back to log in
+            </button>
+          </p>
+        </div>
+      );
+    }
+
+    if (mode === "reset") {
+      return (
+        <div className="max-w-md mx-auto px-4 sm:px-6 py-12">
+          <div className="text-center mb-8">
+            <div className="w-16 h-16 rounded-full bg-plum/10 flex items-center justify-center mx-auto mb-4">
+              <User size={28} className="text-plum" />
+            </div>
+            <h1 className="text-2xl font-medium text-plum mb-1">Enter reset code</h1>
+            <p className="text-sm text-ink-muted">
+              Enter the 6-digit code sent to <span className="font-medium text-plum">{forgotEmail}</span>{" "}
+              and choose a new password.
+            </p>
+          </div>
+
+          <form
+            onSubmit={handleResetPassword}
+            className="bg-white border border-cream-soft rounded-2xl p-6 shadow-sm space-y-3"
+          >
+            <div>
+              <label className="text-xs text-ink-muted mb-1 block">Reset code</label>
+              <input
+                required
+                inputMode="numeric"
+                maxLength={6}
+                value={resetCode}
+                onChange={(e) => setResetCode(onlyDigits(e.target.value).slice(0, 6))}
+                className="w-full text-center tracking-[0.5em] text-lg font-medium rounded-xl border border-cream-soft px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-berry/30"
+                placeholder="000000"
+              />
+            </div>
+            <div>
+              <label className="text-xs text-ink-muted mb-1 block">New password</label>
+              <input
+                type="password"
+                required
+                minLength={6}
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="w-full text-sm rounded-xl border border-cream-soft px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-berry/30"
+                placeholder="At least 6 characters"
+              />
+            </div>
+
+            {error && <p className="text-sm text-[#A32D2D]">{error}</p>}
+            {message && <p className="text-sm text-[#1E7A6E]">{message}</p>}
+
+            <button
+              type="submit"
+              disabled={authBusy || resetCode.length !== 6}
+              className="w-full bg-plum text-cream text-sm font-medium py-3 rounded-xl disabled:opacity-60 mt-1"
+            >
+              {authBusy ? "Saving..." : "Reset password"}
+            </button>
+          </form>
+
+          <p className="text-center text-sm text-ink-muted mt-5">
+            Didn&apos;t get it?{" "}
+            <button
+              type="button"
+              onClick={handleResendReset}
+              disabled={resetCooldown > 0}
+              className="text-berry-dark font-medium disabled:opacity-50"
+            >
+              {resetCooldown > 0 ? `Resend in ${resetCooldown}s` : "Resend code"}
+            </button>
+          </p>
+          <p className="text-center text-sm text-ink-muted mt-2">
+            <button
+              type="button"
+              onClick={() => {
+                setMode("login");
+                setError("");
+                setMessage("");
+              }}
+              className="text-ink-muted underline"
+            >
+              Back to log in
+            </button>
+          </p>
+        </div>
+      );
+    }
+
     const signupCountry = findCountry(countryCode);
 
     return (
@@ -517,6 +751,20 @@ export default function AccountPage() {
               className="w-full text-sm rounded-xl border border-cream-soft px-3.5 py-2.5 focus:outline-none focus:ring-2 focus:ring-berry/30"
               placeholder={mode === "signup" ? "At least 6 characters" : "Your password"}
             />
+            {mode === "login" && (
+              <button
+                type="button"
+                onClick={() => {
+                  setForgotEmail(email);
+                  setMode("forgot");
+                  setError("");
+                  setMessage("");
+                }}
+                className="text-xs text-berry-dark font-medium mt-1.5"
+              >
+                Forgot password?
+              </button>
+            )}
           </div>
 
           {error && <p className="text-sm text-[#A32D2D]">{error}</p>}
