@@ -1,24 +1,19 @@
-// Thin wrapper around Resend for transactional emails (currently just the
-// signup email-verification code). Requires RESEND_API_KEY and
-// RESEND_FROM_EMAIL to be set — see .env.example.
+// Sends the signup email-verification code.
+//
+// Two providers are supported — pick whichever env vars you set:
+//  1) Gmail SMTP (free, no domain needed) — set GMAIL_USER + GMAIL_APP_PASSWORD.
+//  2) Resend (needs a verified domain to email real customers) — set RESEND_API_KEY.
+//
+// If GMAIL_USER is set, Gmail is used. Otherwise it falls back to Resend.
+// See .env.example for setup instructions for each.
+
+import nodemailer from "nodemailer";
 
 const RESEND_API_URL = "https://api.resend.com/emails";
 
-export async function sendVerificationEmail(to: string, code: string, name?: string) {
-  const apiKey = process.env.RESEND_API_KEY;
-  const from = process.env.RESEND_FROM_EMAIL || "Maccha Bazar <onboarding@resend.dev>";
-
-  if (!apiKey) {
-    // No email provider configured — don't crash the signup flow in local
-    // dev, just log the code so it can still be tested.
-    console.warn(
-      `[email] RESEND_API_KEY not set. Verification code for ${to}: ${code}`
-    );
-    return { skipped: true };
-  }
-
+function buildHtml(code: string, name?: string) {
   const greeting = name ? `Hi ${name},` : "Hi,";
-  const html = `
+  return `
     <div style="font-family: -apple-system, Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 24px;">
       <h2 style="color:#4a1d3d; margin-bottom: 8px;">Verify your email</h2>
       <p style="color:#555; font-size: 14px;">${greeting}</p>
@@ -29,7 +24,29 @@ export async function sendVerificationEmail(to: string, code: string, name?: str
       <p style="color:#999; font-size: 12px;">If you didn't request this, you can safely ignore this email.</p>
     </div>
   `;
+}
 
+async function sendViaGmail(to: string, code: string, name?: string) {
+  const user = process.env.GMAIL_USER as string;
+  const pass = process.env.GMAIL_APP_PASSWORD as string;
+  const fromName = process.env.GMAIL_FROM_NAME || "Maccha Bazar";
+
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: { user, pass }
+  });
+
+  await transporter.sendMail({
+    from: `${fromName} <${user}>`,
+    to,
+    subject: `${code} is your Maccha Bazar verification code`,
+    html: buildHtml(code, name)
+  });
+}
+
+async function sendViaResend(to: string, code: string, name?: string) {
+  const apiKey = process.env.RESEND_API_KEY as string;
+  const from = process.env.RESEND_FROM_EMAIL || "Maccha Bazar <onboarding@resend.dev>";
   const replyTo = process.env.RESEND_REPLY_TO_EMAIL;
 
   const res = await fetch(RESEND_API_URL, {
@@ -43,7 +60,7 @@ export async function sendVerificationEmail(to: string, code: string, name?: str
       to,
       ...(replyTo ? { reply_to: replyTo } : {}),
       subject: `${code} is your Maccha Bazar verification code`,
-      html
+      html: buildHtml(code, name)
     })
   });
 
@@ -52,6 +69,26 @@ export async function sendVerificationEmail(to: string, code: string, name?: str
     console.error("Resend email failed:", res.status, errText);
     throw new Error("Could not send verification email.");
   }
+}
 
-  return { skipped: false };
+export async function sendVerificationEmail(to: string, code: string, name?: string) {
+  const hasGmail = !!process.env.GMAIL_USER && !!process.env.GMAIL_APP_PASSWORD;
+  const hasResend = !!process.env.RESEND_API_KEY;
+
+  if (hasGmail) {
+    await sendViaGmail(to, code, name);
+    return { skipped: false };
+  }
+
+  if (hasResend) {
+    await sendViaResend(to, code, name);
+    return { skipped: false };
+  }
+
+  // No email provider configured — don't crash the signup flow in local
+  // dev, just log the code so it can still be tested.
+  console.warn(
+    `[email] No email provider configured (GMAIL_USER or RESEND_API_KEY). Verification code for ${to}: ${code}`
+  );
+  return { skipped: true };
 }
