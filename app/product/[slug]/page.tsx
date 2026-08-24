@@ -4,7 +4,6 @@ import { Fish, ArrowLeft } from "lucide-react";
 import type { Metadata } from "next";
 import { getProductBySlug, getSiteSettings } from "@/lib/data";
 import ProductOrderPanel from "@/components/ProductOrderPanel";
-import ProductComments from "@/components/ProductComments";
 
 export const dynamic = "force-dynamic";
 
@@ -59,8 +58,6 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
         <h2 className="text-lg font-medium text-plum mb-3">About this fish</h2>
         <p className="text-sm text-ink-muted leading-relaxed">{product.description}</p>
       </div>
-
-      <ProductComments productId={product.id} />
     </div>
   );
 }

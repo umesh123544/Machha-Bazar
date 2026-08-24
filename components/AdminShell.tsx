@@ -15,7 +15,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   return (
     <div className="bg-cream min-h-screen flex flex-col sm:flex-row">
       <AdminSidebar />
-      <div className="flex-1 p-4 sm:p-8 min-w-0">{children}</div>
+      <div className="flex-1 p-4 sm:p-8">{children}</div>
       <InstallPWA
         title="Install Admin App"
         description="Add the admin dashboard to your home screen for quick access on your phone."
