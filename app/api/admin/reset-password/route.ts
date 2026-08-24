@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { verifyOtp } from "@/lib/otp";
-import { adminResetStore } from "@/app/api/admin/forgot-password/route";
+import { adminResetStore } from "@/lib/admin-reset-store";
 import { getAdminUserByUsername } from "@/lib/data";
 import { supabaseAdmin } from "@/lib/supabaseClient";
 
