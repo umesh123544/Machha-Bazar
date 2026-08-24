@@ -6,6 +6,7 @@ import ProductCard from "@/components/ProductCard";
 import InstallPWA from "@/components/InstallPWA";
 import BannerCarousel from "@/components/BannerCarousel";
 import BannerSingle from "@/components/BannerSingle";
+import OfferBanner from "@/components/OfferBanner";
 import { whatsappLink, buildInquiryMessage } from "@/lib/whatsapp";
 
 export const dynamic = "force-dynamic";
@@ -41,6 +42,12 @@ export default async function HomePage() {
           <BannerSingle settings={settings} />
         )}
       </section>
+
+      {settings.offer?.enabled && (
+        <section className="max-w-6xl mx-auto px-4 sm:px-6 -mt-6 pb-8">
+          <OfferBanner offer={settings.offer} />
+        </section>
+      )}
 
       <section className="max-w-6xl mx-auto px-4 sm:px-6 pb-16">
         <div className="flex items-end justify-between mb-6">

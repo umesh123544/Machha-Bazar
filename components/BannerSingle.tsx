@@ -130,6 +130,85 @@ export default function BannerSingle({ settings }: { settings: SiteSettings }) {
     );
   }
 
+
+  if (bannerTemplate === "magazine") {
+    return (
+      <div className="rounded-2xl overflow-hidden border border-cream-soft bg-white">
+        <div className="grid grid-cols-1 sm:grid-cols-12 min-h-[280px] sm:min-h-[340px]">
+          <div
+            className="sm:col-span-7 relative bg-plum min-h-[200px] bg-cover bg-center"
+            style={bannerImage ? { backgroundImage: `url(${bannerImage})` } : undefined}
+          >
+            {!bannerImage && <Fish className="absolute inset-0 m-auto text-amber/10" size={160} aria-hidden />}
+            {bannerBadge && (
+              <span className="absolute top-4 left-4 text-[11px] font-semibold tracking-wide uppercase text-plum bg-amber px-3 py-1 rounded-full shadow">
+                {bannerBadge}
+              </span>
+            )}
+          </div>
+          <div className="sm:col-span-5 px-6 sm:px-8 py-10 sm:py-12 flex flex-col justify-center bg-cream">
+            <p className="text-[11px] font-medium tracking-widest uppercase text-berry-dark mb-3">{TAGLINE}</p>
+            <h1 className="text-2xl sm:text-3xl font-medium text-plum leading-snug mb-3">{bannerHeadline}</h1>
+            <p className="text-sm text-ink-muted mb-6 leading-relaxed">{bannerSubheading}</p>
+            <CtaButtons whatsappNumber={whatsappNumber} variant="light" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (bannerTemplate === "overlay") {
+    return (
+      <div
+        className="rounded-2xl relative overflow-hidden min-h-[320px] sm:min-h-[400px] bg-plum bg-cover bg-center flex items-end"
+        style={bannerImage ? { backgroundImage: `url(${bannerImage})` } : undefined}
+      >
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10" />
+        {!bannerImage && <Fish className="absolute inset-0 m-auto text-amber/10" size={200} aria-hidden />}
+        <div className="relative z-10 p-6 sm:p-10 w-full max-w-2xl">
+          {bannerBadge && (
+            <span className="inline-block text-xs font-semibold text-plum bg-amber px-3 py-1 rounded-md mb-4 shadow-lg">
+              {bannerBadge}
+            </span>
+          )}
+          <h1 className="text-3xl sm:text-5xl font-medium text-white leading-tight mb-3 drop-shadow-sm">{bannerHeadline}</h1>
+          <p className="text-sm sm:text-base text-white/80 mb-6 max-w-lg">{bannerSubheading}</p>
+          <div className="flex flex-wrap gap-3">
+            <CtaButtons whatsappNumber={whatsappNumber} variant="dark" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (bannerTemplate === "wave") {
+    return (
+      <div className="rounded-2xl overflow-hidden relative bg-plum">
+        <div className="relative z-10 px-6 sm:px-12 py-14 sm:py-20 max-w-xl">
+          {bannerBadge && (
+            <span className="inline-flex items-center gap-1.5 text-xs font-medium text-amber border border-amber/40 px-3 py-1.5 rounded-full mb-5">
+              <span className="w-1.5 h-1.5 rounded-full bg-amber animate-pulse" />
+              {bannerBadge}
+            </span>
+          )}
+          <h1 className="text-3xl sm:text-4xl font-medium text-cream leading-tight mb-4">{bannerHeadline}</h1>
+          <p className="text-sm sm:text-base text-cream/65 mb-8">{bannerSubheading}</p>
+          <div className="flex flex-wrap gap-3">
+            <CtaButtons whatsappNumber={whatsappNumber} variant="dark" />
+          </div>
+        </div>
+        <div
+          className="absolute right-0 top-0 bottom-0 w-1/2 hidden sm:block bg-cover bg-center opacity-40"
+          style={bannerImage ? { backgroundImage: `url(${bannerImage})`, maskImage: "linear-gradient(to left, black 40%, transparent)" } : undefined}
+        />
+        <svg className="absolute bottom-0 left-0 right-0 text-cream/10" viewBox="0 0 1200 120" preserveAspectRatio="none" aria-hidden>
+          <path fill="currentColor" d="M0,60 C150,120 350,0 600,60 C850,120 1050,0 1200,60 L1200,120 L0,120 Z" />
+        </svg>
+        {!bannerImage && <Fish className="absolute right-8 bottom-8 text-amber/10" size={140} aria-hidden />}
+      </div>
+    );
+  }
+
   // classic (default)
   return (
     <div
