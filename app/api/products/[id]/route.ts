@@ -3,6 +3,8 @@ import { updateProduct, deleteProduct } from "@/lib/data";
 import { requirePermission } from "@/lib/auth";
 import type { Product } from "@/lib/types";
 
+export const dynamic = "force-dynamic";
+
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   if (!(await requirePermission("products"))) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Sparkles, Clock, Tag, ArrowRight } from "lucide-react";
 import type { OfferSettings } from "@/lib/types";
@@ -37,7 +37,21 @@ function formatNepalEnd(endsAt: string) {
   }
 }
 
-function Countdown({ parts, tone }: { parts: Parts; tone: "dark" | "light" }) {
+// Ticks on its own, once a second, and only re-renders this small subtree.
+// Earlier this state lived on the parent OfferBanner, so every tick re-rendered
+// the whole card — including the blurred decorative layers and background
+// photo — which made scrolling/swiping feel janky while an offer was live.
+const Countdown = memo(function Countdown({ endsAt, tone }: { endsAt: string; tone: "dark" | "light" }) {
+  const [parts, setParts] = useState<Parts | null>(() => getParts(endsAt));
+
+  useEffect(() => {
+    setParts(getParts(endsAt));
+    const id = setInterval(() => setParts(getParts(endsAt)), 1000);
+    return () => clearInterval(id);
+  }, [endsAt]);
+
+  if (!parts) return null;
+
   const boxClass =
     tone === "dark"
       ? "min-w-[50px] rounded-lg bg-black/30 border border-white/10 backdrop-blur px-2 py-1.5 text-center"
@@ -61,7 +75,26 @@ function Countdown({ parts, tone }: { parts: Parts; tone: "dark" | "light" }) {
       ))}
     </div>
   );
-}
+});
+
+// Same idea as Countdown above, but the compact inline text used by the "bar" template.
+const InlineCountdown = memo(function InlineCountdown({ endsAt }: { endsAt: string }) {
+  const [parts, setParts] = useState<Parts | null>(() => getParts(endsAt));
+
+  useEffect(() => {
+    setParts(getParts(endsAt));
+    const id = setInterval(() => setParts(getParts(endsAt)), 1000);
+    return () => clearInterval(id);
+  }, [endsAt]);
+
+  if (!parts) return null;
+
+  return (
+    <span className="text-xs text-cream/70 tabular-nums">
+      {pad(parts.days)}d {pad(parts.hours)}h {pad(parts.minutes)}m {pad(parts.seconds)}s left
+    </span>
+  );
+});
 
 function PhotoBlock({
   image,
@@ -91,19 +124,30 @@ function PhotoBlock({
 }
 
 export default function OfferBanner({ offer }: { offer: OfferSettings }) {
-  const [parts, setParts] = useState<Parts | null>(() => getParts(offer.endsAt));
+  // Only tracks whether the offer has ENDED — flips (at most) once, via a single
+  // timeout fired exactly at the end time, instead of polling every second.
+  // Per-second ticking now lives entirely inside Countdown/InlineCountdown below,
+  // so this parent (and its blurred/background-image decoration) doesn't
+  // re-render every tick.
+  const [hasEnded, setHasEnded] = useState(() => !!offer.endsAt && getParts(offer.endsAt) === null);
 
   useEffect(() => {
-    setParts(getParts(offer.endsAt));
-    const id = setInterval(() => setParts(getParts(offer.endsAt)), 1000);
-    return () => clearInterval(id);
+    if (!offer.endsAt) {
+      setHasEnded(false);
+      return;
+    }
+    const msLeft = new Date(offer.endsAt).getTime() - Date.now();
+    setHasEnded(msLeft <= 0);
+    if (msLeft <= 0) return;
+    const id = setTimeout(() => setHasEnded(true), msLeft);
+    return () => clearTimeout(id);
   }, [offer.endsAt]);
 
   const active = useMemo(() => {
     if (!offer.enabled) return false;
     if (!offer.endsAt) return true; // no end = show until manually hidden
-    return parts !== null;
-  }, [offer.enabled, offer.endsAt, parts]);
+    return !hasEnded;
+  }, [offer.enabled, offer.endsAt, hasEnded]);
 
   if (!active) return null;
 
@@ -154,7 +198,7 @@ export default function OfferBanner({ offer }: { offer: OfferSettings }) {
         <div className="p-5 sm:p-8 pr-16 sm:pr-24 relative">
           <h2 className="text-xl sm:text-2xl font-medium mb-2 max-w-md">{offer.title || "Limited time offer"}</h2>
           {offer.subtitle && <p className="text-sm text-cream/70 max-w-md mb-4">{offer.subtitle}</p>}
-          {parts && <div className="mb-4"><Countdown parts={parts} tone="dark" /></div>}
+          {offer.endsAt && <div className="mb-4"><Countdown endsAt={offer.endsAt} tone="dark" /></div>}
           <Link
             href={offer.ctaLink || "/shop"}
             className="inline-flex items-center gap-2 bg-amber hover:bg-amber-dark text-plum text-sm font-semibold px-5 py-2.5 rounded-lg transition-colors"
@@ -177,7 +221,7 @@ export default function OfferBanner({ offer }: { offer: OfferSettings }) {
           </span>
           <h2 className="text-xl sm:text-2xl font-medium mb-2">{offer.title || "Limited time offer"}</h2>
           {offer.subtitle && <p className="text-sm text-cream/70 mb-4">{offer.subtitle}</p>}
-          {parts && <div className="mb-5"><Countdown parts={parts} tone="dark" /></div>}
+          {offer.endsAt && <div className="mb-5"><Countdown endsAt={offer.endsAt} tone="dark" /></div>}
           <Link
             href={offer.ctaLink || "/shop"}
             className="inline-flex w-fit items-center gap-2 bg-berry hover:bg-berry-dark text-berry-text text-sm font-medium px-5 py-2.5 rounded-lg transition-colors"
@@ -238,11 +282,7 @@ export default function OfferBanner({ offer }: { offer: OfferSettings }) {
             {offer.badge || "OFFER"}
           </span>
           <span className="text-sm font-medium">{offer.title || "Limited time offer"}</span>
-          {parts && (
-            <span className="text-xs text-cream/70 tabular-nums">
-              {pad(parts.days)}d {pad(parts.hours)}h {pad(parts.minutes)}m {pad(parts.seconds)}s left
-            </span>
-          )}
+          {offer.endsAt && <InlineCountdown endsAt={offer.endsAt} />}
         </div>
         <Link
           href={offer.ctaLink || "/shop"}
@@ -290,7 +330,7 @@ export default function OfferBanner({ offer }: { offer: OfferSettings }) {
             <p className="text-sm text-cream/75 max-w-md leading-relaxed">{offer.subtitle}</p>
           )}
 
-          {parts && <Countdown parts={parts} tone="dark" />}
+          {offer.endsAt && <Countdown endsAt={offer.endsAt} tone="dark" />}
 
           <div className="pt-2">
             <Link
