@@ -1,19 +1,19 @@
 import { supabaseAdmin } from "./supabaseClient";
-import type {
-  Product,
-  Category,
-  SiteSettings,
-  AdminUser,
-  AdminPermissions,
-  HomepageContent,
-  BannerSlide,
-  Customer,
-  ProductComment,
-  CustomerOrder,
-  CustomerOrderItem
-} from "./types";
+import type { Product, Category, SiteSettings, AdminUser, AdminPermissions, HomepageContent, BannerSlide, OfferSettings } from "./types";
 
 // ---- row <-> app-type mapping ----
+
+export const DEFAULT_OFFER: OfferSettings = {
+  enabled: false,
+  title: "Limited time offer",
+  subtitle: "Special deals on selected aquarium fish — order before time runs out.",
+  badge: "OFFER",
+  ctaText: "Shop the offer",
+  ctaLink: "/shop",
+  endsAt: "",
+  image: "",
+  template: "gradient"
+};
 
 export const DEFAULT_HOMEPAGE_CONTENT: HomepageContent = {
   availableTitle: "Available now",
@@ -82,6 +82,8 @@ type SettingsRow = {
   delivery_note: string;
   facebook_url: string;
   instagram_url: string;
+  tiktok_url: string | null;
+  youtube_url: string | null;
   logo_url: string | null;
   logo_size: string | null;
   banner_image: string | null;
@@ -97,6 +99,7 @@ type SettingsRow = {
   homepage_content: HomepageContent | null;
   show_about_page: boolean | null;
   show_delivery_page: boolean | null;
+  offer_settings: OfferSettings | null;
 };
 
 type AdminUserRow = {
@@ -181,13 +184,15 @@ function rowToSettings(r: SettingsRow): SiteSettings {
     deliveryNote: r.delivery_note,
     facebookUrl: r.facebook_url,
     instagramUrl: r.instagram_url,
+    tiktokUrl: r.tiktok_url || "",
+    youtubeUrl: r.youtube_url || "",
     logoUrl: r.logo_url || "",
     logoSize: r.logo_size === "small" || r.logo_size === "large" ? r.logo_size : "medium",
     bannerImage: r.banner_image || "",
     bannerBadge: r.banner_badge || "Kathmandu Valley delivery",
     bannerHeadline: r.banner_headline || "Bring home something beautiful.",
     bannerSubheading: r.banner_subheading || "Healthy, carefully raised aquarium fish for your home.",
-    bannerTemplate: (["classic", "split", "centered", "card", "gradient", "carousel"].includes(r.banner_template || "")
+    bannerTemplate: (["classic", "split", "centered", "card", "gradient", "carousel", "magazine", "overlay", "wave"].includes(r.banner_template || "")
       ? r.banner_template
       : "classic") as SiteSettings["bannerTemplate"],
     bannerSlides: Array.isArray(r.banner_slides) ? r.banner_slides.slice(0, 5) : [],
@@ -199,7 +204,10 @@ function rowToSettings(r: SettingsRow): SiteSettings {
       ? { ...DEFAULT_HOMEPAGE_CONTENT, ...r.homepage_content }
       : DEFAULT_HOMEPAGE_CONTENT,
     showAboutPage: r.show_about_page !== false,
-    showDeliveryPage: r.show_delivery_page !== false
+    showDeliveryPage: r.show_delivery_page !== false,
+    offer: r.offer_settings
+      ? { ...DEFAULT_OFFER, ...r.offer_settings }
+      : { ...DEFAULT_OFFER }
   };
 }
 
@@ -217,6 +225,8 @@ function settingsToRow(s: SiteSettings): SettingsRow {
     delivery_note: s.deliveryNote,
     facebook_url: s.facebookUrl,
     instagram_url: s.instagramUrl,
+    tiktok_url: s.tiktokUrl || null,
+    youtube_url: s.youtubeUrl || null,
     logo_url: s.logoUrl || null,
     logo_size: s.logoSize || "medium",
     banner_image: s.bannerImage || null,
@@ -231,7 +241,8 @@ function settingsToRow(s: SiteSettings): SettingsRow {
     site_font: s.siteFont || null,
     homepage_content: s.homepageContent || null,
     show_about_page: s.showAboutPage !== false,
-    show_delivery_page: s.showDeliveryPage !== false
+    show_delivery_page: s.showDeliveryPage !== false,
+    offer_settings: s.offer || DEFAULT_OFFER
   };
 }
 
@@ -262,14 +273,14 @@ export async function getActiveProducts(): Promise<Product[]> {
   return products.filter((p) => p.isActive && !p.isComingSoon);
 }
 
-export async function getProductBySlug(slug: string): Promise<Product | undefined> {
-  const { data, error } = await supabaseAdmin.from("products").select("*").eq("slug", slug).maybeSingle();
+export async function getProductById(id: string): Promise<Product | undefined> {
+  const { data, error } = await supabaseAdmin.from("products").select("*").eq("id", id).maybeSingle();
   if (error) throw error;
   return data ? rowToProduct(data as ProductRow) : undefined;
 }
 
-export async function getProductById(id: string): Promise<Product | undefined> {
-  const { data, error } = await supabaseAdmin.from("products").select("*").eq("id", id).maybeSingle();
+export async function getProductBySlug(slug: string): Promise<Product | undefined> {
+  const { data, error } = await supabaseAdmin.from("products").select("*").eq("slug", slug).maybeSingle();
   if (error) throw error;
   return data ? rowToProduct(data as ProductRow) : undefined;
 }
@@ -410,141 +421,117 @@ export async function getAllPageContent(): Promise<PageContent[]> {
   }));
 }
 
+
 // ---- customers ----
 
 type CustomerRow = {
   id: string;
   name: string;
   phone: string;
-  phone_country_code: string;
+  phone_country_code: string | null;
   email: string;
   password_hash: string;
   address: string;
   delivery_area: string;
   notes: string;
+  created_at: string;
+  updated_at: string;
+  last_login_at: string | null;
   avatar_url: string | null;
-  email_verified: boolean;
+  email_verified: boolean | null;
   verification_code_hash: string | null;
   verification_expires_at: string | null;
   verification_sent_at: string | null;
-  reset_code_hash: string | null;
-  reset_expires_at: string | null;
-  reset_sent_at: string | null;
-  last_login_at: string | null;
-  created_at: string;
-  updated_at: string;
+};
+
+export type Customer = {
+  id: string;
+  name: string;
+  phone: string;
+  phoneCountryCode: string;
+  email: string;
+  address: string;
+  deliveryArea: string;
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
+  lastLoginAt: string | null;
+  avatarUrl: string;
+  emailVerified: boolean;
 };
 
 function rowToCustomer(r: CustomerRow): Customer {
   return {
     id: r.id,
-    name: r.name || "",
-    phone: r.phone || "",
+    name: r.name,
+    phone: r.phone,
     phoneCountryCode: r.phone_country_code || "+977",
     email: r.email,
-    passwordHash: r.password_hash,
-    address: r.address || "",
-    deliveryArea: r.delivery_area || "",
-    notes: r.notes || "",
-    avatarUrl: r.avatar_url || "",
-    emailVerified: !!r.email_verified,
-    verificationCodeHash: r.verification_code_hash,
-    verificationExpiresAt: r.verification_expires_at,
-    verificationSentAt: r.verification_sent_at,
-    resetCodeHash: r.reset_code_hash,
-    resetExpiresAt: r.reset_expires_at,
-    resetSentAt: r.reset_sent_at,
-    lastLoginAt: r.last_login_at,
+    address: r.address,
+    deliveryArea: r.delivery_area,
+    notes: r.notes,
     createdAt: r.created_at,
-    updatedAt: r.updated_at
+    updatedAt: r.updated_at,
+    lastLoginAt: r.last_login_at || null,
+    avatarUrl: r.avatar_url || "",
+    emailVerified: !!r.email_verified
   };
 }
 
-export async function getAllCustomers(): Promise<Customer[]> {
-  const { data, error } = await supabaseAdmin
-    .from("customers")
-    .select("*")
-    .order("created_at", { ascending: false });
-  if (error) throw error;
-  return (data as CustomerRow[]).map(rowToCustomer);
-}
-
-export async function getCustomerById(id: string): Promise<Customer | undefined> {
-  const { data, error } = await supabaseAdmin.from("customers").select("*").eq("id", id).maybeSingle();
-  if (error) throw error;
-  return data ? rowToCustomer(data as CustomerRow) : undefined;
-}
-
-export async function getCustomerByEmail(email: string): Promise<Customer | undefined> {
+export async function getCustomerByEmail(
+  email: string
+): Promise<(Customer & { passwordHash: string }) | null> {
   const { data, error } = await supabaseAdmin
     .from("customers")
     .select("*")
     .eq("email", email.toLowerCase().trim())
     .maybeSingle();
   if (error) throw error;
-  return data ? rowToCustomer(data as CustomerRow) : undefined;
+  if (!data) return null;
+  const row = data as CustomerRow;
+  return { ...rowToCustomer(row), passwordHash: row.password_hash };
+}
+
+export async function getCustomerById(id: string): Promise<Customer | null> {
+  const { data, error } = await supabaseAdmin.from("customers").select("*").eq("id", id).maybeSingle();
+  if (error) throw error;
+  if (!data) return null;
+  return rowToCustomer(data as CustomerRow);
 }
 
 export async function createCustomer(input: {
   name: string;
-  phone?: string;
+  phone: string;
   phoneCountryCode?: string;
   email: string;
   passwordHash: string;
   address?: string;
   deliveryArea?: string;
-  emailVerified?: boolean;
   verificationCodeHash?: string;
   verificationExpiresAt?: string;
+  emailVerified?: boolean; // true for admin-created customers (skip OTP)
 }): Promise<Customer> {
   const now = new Date().toISOString();
   const row = {
     id: `c${Date.now()}`,
-    name: input.name,
-    phone: input.phone || "",
+    name: input.name.trim(),
+    phone: input.phone.trim(),
     phone_country_code: input.phoneCountryCode || "+977",
     email: input.email.toLowerCase().trim(),
     password_hash: input.passwordHash,
-    address: input.address || "",
-    delivery_area: input.deliveryArea || "",
+    address: input.address?.trim() || "",
+    delivery_area: input.deliveryArea?.trim() || "",
     notes: "",
-    avatar_url: "",
-    email_verified: input.emailVerified ?? false,
+    created_at: now,
+    updated_at: now,
+    email_verified: !!input.emailVerified,
     verification_code_hash: input.verificationCodeHash || null,
     verification_expires_at: input.verificationExpiresAt || null,
-    verification_sent_at: input.verificationCodeHash ? now : null,
-    created_at: now,
-    updated_at: now
+    verification_sent_at: now
   };
   const { data, error } = await supabaseAdmin.from("customers").insert(row).select().single();
   if (error) throw error;
   return rowToCustomer(data as CustomerRow);
-}
-
-export async function updateCustomer(
-  id: string,
-  patch: Partial<{
-    name: string;
-    phone: string;
-    phoneCountryCode: string;
-    address: string;
-    deliveryArea: string;
-    notes: string;
-    avatarUrl: string;
-  }>
-): Promise<Customer | undefined> {
-  const row: Record<string, unknown> = { updated_at: new Date().toISOString() };
-  if (patch.name !== undefined) row.name = patch.name;
-  if (patch.phone !== undefined) row.phone = patch.phone;
-  if (patch.phoneCountryCode !== undefined) row.phone_country_code = patch.phoneCountryCode;
-  if (patch.address !== undefined) row.address = patch.address;
-  if (patch.deliveryArea !== undefined) row.delivery_area = patch.deliveryArea;
-  if (patch.notes !== undefined) row.notes = patch.notes;
-  if (patch.avatarUrl !== undefined) row.avatar_url = patch.avatarUrl;
-
-  const { data, error } = await supabaseAdmin.from("customers").update(row).eq("id", id).select().maybeSingle();
-  if (error) throw error;
-  return data ? rowToCustomer(data as CustomerRow) : undefined;
 }
 
 export async function deleteCustomer(id: string): Promise<void> {
@@ -552,33 +539,71 @@ export async function deleteCustomer(id: string): Promise<void> {
   if (error) throw error;
 }
 
-export async function touchCustomerLogin(id: string): Promise<void> {
+// ---- forgot / reset password ----
+
+export async function setCustomerResetCode(
+  email: string,
+  codeHash: string,
+  expiresAt: string
+): Promise<boolean> {
+  const { data, error } = await supabaseAdmin
+    .from("customers")
+    .update({
+      reset_code_hash: codeHash,
+      reset_expires_at: expiresAt,
+      reset_sent_at: new Date().toISOString()
+    })
+    .eq("email", email.toLowerCase().trim())
+    .select("id")
+    .maybeSingle();
+  if (error) throw error;
+  return !!data;
+}
+
+export async function getCustomerResetState(email: string): Promise<{
+  id: string;
+  name: string;
+  resetCodeHash: string | null;
+  resetExpiresAt: string | null;
+  resetSentAt: string | null;
+} | null> {
+  const { data, error } = await supabaseAdmin
+    .from("customers")
+    .select("id, name, reset_code_hash, reset_expires_at, reset_sent_at")
+    .eq("email", email.toLowerCase().trim())
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) return null;
+  const row = data as {
+    id: string;
+    name: string;
+    reset_code_hash: string | null;
+    reset_expires_at: string | null;
+    reset_sent_at: string | null;
+  };
+  return {
+    id: row.id,
+    name: row.name,
+    resetCodeHash: row.reset_code_hash,
+    resetExpiresAt: row.reset_expires_at,
+    resetSentAt: row.reset_sent_at
+  };
+}
+
+export async function resetCustomerPassword(email: string, passwordHash: string): Promise<void> {
   const { error } = await supabaseAdmin
     .from("customers")
-    .update({ last_login_at: new Date().toISOString() })
-    .eq("id", id);
+    .update({
+      password_hash: passwordHash,
+      reset_code_hash: null,
+      reset_expires_at: null,
+      updated_at: new Date().toISOString()
+    })
+    .eq("email", email.toLowerCase().trim());
   if (error) throw error;
 }
 
-// ---- customer email verification ----
-
-export async function getCustomerVerificationState(email: string): Promise<{
-  name: string;
-  emailVerified: boolean;
-  verificationCodeHash: string | null;
-  verificationExpiresAt: string | null;
-  verificationSentAt: string | null;
-} | null> {
-  const customer = await getCustomerByEmail(email);
-  if (!customer) return null;
-  return {
-    name: customer.name,
-    emailVerified: customer.emailVerified,
-    verificationCodeHash: customer.verificationCodeHash,
-    verificationExpiresAt: customer.verificationExpiresAt,
-    verificationSentAt: customer.verificationSentAt
-  };
-}
+// ---- email verification ----
 
 export async function setCustomerVerificationCode(
   email: string,
@@ -596,6 +621,39 @@ export async function setCustomerVerificationCode(
   if (error) throw error;
 }
 
+export async function getCustomerVerificationState(email: string): Promise<{
+  id: string;
+  emailVerified: boolean;
+  verificationCodeHash: string | null;
+  verificationExpiresAt: string | null;
+  verificationSentAt: string | null;
+  name: string;
+} | null> {
+  const { data, error } = await supabaseAdmin
+    .from("customers")
+    .select("id, email_verified, verification_code_hash, verification_expires_at, verification_sent_at, name")
+    .eq("email", email.toLowerCase().trim())
+    .maybeSingle();
+  if (error) throw error;
+  if (!data) return null;
+  const row = data as {
+    id: string;
+    email_verified: boolean | null;
+    verification_code_hash: string | null;
+    verification_expires_at: string | null;
+    verification_sent_at: string | null;
+    name: string;
+  };
+  return {
+    id: row.id,
+    emailVerified: !!row.email_verified,
+    verificationCodeHash: row.verification_code_hash,
+    verificationExpiresAt: row.verification_expires_at,
+    verificationSentAt: row.verification_sent_at,
+    name: row.name
+  };
+}
+
 export async function markCustomerEmailVerified(email: string): Promise<void> {
   const { error } = await supabaseAdmin
     .from("customers")
@@ -608,158 +666,80 @@ export async function markCustomerEmailVerified(email: string): Promise<void> {
   if (error) throw error;
 }
 
-// ---- customer password reset ----
-
-export async function getCustomerResetState(email: string): Promise<{
-  name: string;
-  resetCodeHash: string | null;
-  resetExpiresAt: string | null;
-  resetSentAt: string | null;
-} | null> {
-  const customer = await getCustomerByEmail(email);
-  if (!customer) return null;
-  return {
-    name: customer.name,
-    resetCodeHash: customer.resetCodeHash,
-    resetExpiresAt: customer.resetExpiresAt,
-    resetSentAt: customer.resetSentAt
+export async function updateCustomer(
+  id: string,
+  patch: Partial<{
+    name: string;
+    phone: string;
+    phoneCountryCode: string;
+    address: string;
+    deliveryArea: string;
+    notes: string;
+    avatarUrl: string;
+  }>
+): Promise<Customer | null> {
+  const existing = await getCustomerById(id);
+  if (!existing) return null;
+  const row = {
+    name: patch.name !== undefined ? patch.name.trim() : existing.name,
+    phone: patch.phone !== undefined ? patch.phone.trim() : existing.phone,
+    phone_country_code:
+      patch.phoneCountryCode !== undefined ? patch.phoneCountryCode.trim() : existing.phoneCountryCode,
+    address: patch.address !== undefined ? patch.address.trim() : existing.address,
+    delivery_area: patch.deliveryArea !== undefined ? patch.deliveryArea.trim() : existing.deliveryArea,
+    notes: patch.notes !== undefined ? patch.notes.trim() : existing.notes,
+    avatar_url: patch.avatarUrl !== undefined ? patch.avatarUrl : existing.avatarUrl,
+    updated_at: new Date().toISOString()
   };
-}
-
-export async function setCustomerResetCode(email: string, codeHash: string, expiresAt: string): Promise<void> {
-  const { error } = await supabaseAdmin
+  const { data, error } = await supabaseAdmin
     .from("customers")
-    .update({
-      reset_code_hash: codeHash,
-      reset_expires_at: expiresAt,
-      reset_sent_at: new Date().toISOString()
-    })
-    .eq("email", email.toLowerCase().trim());
+    .update(row)
+    .eq("id", id)
+    .select()
+    .single();
   if (error) throw error;
+  return rowToCustomer(data as CustomerRow);
 }
 
-export async function resetCustomerPassword(email: string, passwordHash: string): Promise<void> {
-  const { error } = await supabaseAdmin
+
+export async function touchCustomerLogin(id: string): Promise<void> {
+  await supabaseAdmin
     .from("customers")
-    .update({
-      password_hash: passwordHash,
-      reset_code_hash: null,
-      reset_expires_at: null
-    })
-    .eq("email", email.toLowerCase().trim());
-  if (error) throw error;
+    .update({ last_login_at: new Date().toISOString() })
+    .eq("id", id);
 }
 
-// ---- product comments / reviews ----
+export async function getAllCustomers(): Promise<Customer[]> {
+  const { data, error } = await supabaseAdmin
+    .from("customers")
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data as CustomerRow[]).map(rowToCustomer);
+}
 
-type ProductCommentRow = {
-  id: string;
-  product_id: string;
-  customer_id: string;
-  customer_name: string;
-  customer_avatar: string;
-  rating: number;
-  comment: string;
-  created_at: string;
-  updated_at: string;
+export type CustomerOrderItem = {
+  productId: string;
+  slug: string;
+  name: string;
+  variantName: string;
+  price: number;
+  quantity: number;
 };
 
-function rowToComment(r: ProductCommentRow): ProductComment {
-  return {
-    id: r.id,
-    productId: r.product_id,
-    customerId: r.customer_id,
-    customerName: r.customer_name || "",
-    customerAvatar: r.customer_avatar || "",
-    rating: r.rating,
-    comment: r.comment || "",
-    createdAt: r.created_at,
-    updatedAt: r.updated_at
-  };
-}
-
-export async function getAllProductComments(): Promise<ProductComment[]> {
-  const { data, error } = await supabaseAdmin
-    .from("product_comments")
-    .select("*")
-    .order("created_at", { ascending: false });
-  if (error) throw error;
-  return (data as ProductCommentRow[]).map(rowToComment);
-}
-
-export async function getCommentsByProductId(productId: string): Promise<ProductComment[]> {
-  const { data, error } = await supabaseAdmin
-    .from("product_comments")
-    .select("*")
-    .eq("product_id", productId)
-    .order("created_at", { ascending: false });
-  if (error) throw error;
-  return (data as ProductCommentRow[]).map(rowToComment);
-}
-
-export async function getCommentByCustomerForProduct(
-  productId: string,
-  customerId: string
-): Promise<ProductComment | undefined> {
-  const { data, error } = await supabaseAdmin
-    .from("product_comments")
-    .select("*")
-    .eq("product_id", productId)
-    .eq("customer_id", customerId)
-    .maybeSingle();
-  if (error) throw error;
-  return data ? rowToComment(data as ProductCommentRow) : undefined;
-}
-
-export async function addProductComment(input: {
-  productId: string;
-  customerId: string;
+export type CustomerOrder = {
+  id: string;
+  customerId: string | null;
   customerName: string;
-  customerAvatar?: string;
-  rating: number;
-  comment: string;
-}): Promise<ProductComment> {
-  const now = new Date().toISOString();
-  const row = {
-    id: `pc${Date.now()}`,
-    product_id: input.productId,
-    customer_id: input.customerId,
-    customer_name: input.customerName,
-    customer_avatar: input.customerAvatar || "",
-    rating: input.rating,
-    comment: input.comment,
-    created_at: now,
-    updated_at: now
-  };
-  const { data, error } = await supabaseAdmin.from("product_comments").insert(row).select().single();
-  if (error) throw error;
-  return rowToComment(data as ProductCommentRow);
-}
-
-export async function updateProductComment(
-  id: string,
-  customerId: string,
-  patch: { rating: number; comment: string }
-): Promise<ProductComment | undefined> {
-  const { data, error } = await supabaseAdmin
-    .from("product_comments")
-    .update({ rating: patch.rating, comment: patch.comment, updated_at: new Date().toISOString() })
-    .eq("id", id)
-    .eq("customer_id", customerId)
-    .select()
-    .maybeSingle();
-  if (error) throw error;
-  return data ? rowToComment(data as ProductCommentRow) : undefined;
-}
-
-export async function deleteProductComment(id: string, customerId?: string): Promise<void> {
-  let query = supabaseAdmin.from("product_comments").delete().eq("id", id);
-  if (customerId) query = query.eq("customer_id", customerId);
-  const { error } = await query;
-  if (error) throw error;
-}
-
-// ---- customer orders (activity log) ----
+  customerPhone: string;
+  customerEmail: string;
+  customerAddress: string;
+  deliveryArea: string;
+  items: CustomerOrderItem[];
+  totalPrice: number;
+  itemCount: number;
+  createdAt: string;
+};
 
 type CustomerOrderRow = {
   id: string;
@@ -779,14 +759,14 @@ function rowToOrder(r: CustomerOrderRow): CustomerOrder {
   return {
     id: r.id,
     customerId: r.customer_id,
-    customerName: r.customer_name || "",
-    customerPhone: r.customer_phone || "",
-    customerEmail: r.customer_email || "",
-    customerAddress: r.customer_address || "",
-    deliveryArea: r.delivery_area || "",
-    items: r.items || [],
-    totalPrice: r.total_price || 0,
-    itemCount: r.item_count || 0,
+    customerName: r.customer_name,
+    customerPhone: r.customer_phone,
+    customerEmail: r.customer_email,
+    customerAddress: r.customer_address,
+    deliveryArea: r.delivery_area,
+    items: Array.isArray(r.items) ? r.items : [],
+    totalPrice: r.total_price,
+    itemCount: r.item_count,
     createdAt: r.created_at
   };
 }
@@ -801,7 +781,7 @@ export async function createCustomerOrder(input: {
   items: CustomerOrderItem[];
   totalPrice: number;
 }): Promise<CustomerOrder> {
-  const itemCount = input.items.reduce((sum, i) => sum + (Number(i.quantity) || 0), 0);
+  const itemCount = input.items.reduce((sum, i) => sum + i.quantity, 0);
   const row = {
     id: `o${Date.now()}`,
     customer_id: input.customerId,
@@ -820,6 +800,16 @@ export async function createCustomerOrder(input: {
   return rowToOrder(data as CustomerOrderRow);
 }
 
+export async function getAllCustomerOrders(limit = 100): Promise<CustomerOrder[]> {
+  const { data, error } = await supabaseAdmin
+    .from("customer_orders")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  if (error) throw error;
+  return (data as CustomerOrderRow[]).map(rowToOrder);
+}
+
 export async function getOrdersByCustomerId(customerId: string): Promise<CustomerOrder[]> {
   const { data, error } = await supabaseAdmin
     .from("customer_orders")
@@ -830,23 +820,160 @@ export async function getOrdersByCustomerId(customerId: string): Promise<Custome
   return (data as CustomerOrderRow[]).map(rowToOrder);
 }
 
-export async function getAllCustomerOrders(limit = 50): Promise<CustomerOrder[]> {
-  const { data, error } = await supabaseAdmin
-    .from("customer_orders")
-    .select("*")
-    .order("created_at", { ascending: false })
-    .limit(limit);
-  if (error) throw error;
-  return (data as CustomerOrderRow[]).map(rowToOrder);
-}
-
 export async function getCustomerOrderCounts(): Promise<Record<string, number>> {
   const { data, error } = await supabaseAdmin.from("customer_orders").select("customer_id");
   if (error) throw error;
   const counts: Record<string, number> = {};
-  for (const row of data as { customer_id: string | null }[]) {
-    if (!row.customer_id) continue;
-    counts[row.customer_id] = (counts[row.customer_id] || 0) + 1;
+  for (const row of data || []) {
+    const id = (row as { customer_id: string | null }).customer_id;
+    if (id) counts[id] = (counts[id] || 0) + 1;
   }
   return counts;
+}
+
+// ---- product comments (reviews) ----
+
+type ProductCommentRow = {
+  id: string;
+  product_id: string;
+  customer_id: string;
+  customer_name: string;
+  customer_avatar: string | null;
+  rating: number;
+  comment: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ProductComment = {
+  id: string;
+  productId: string;
+  customerId: string;
+  customerName: string;
+  customerAvatar: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+function rowToProductComment(r: ProductCommentRow): ProductComment {
+  return {
+    id: r.id,
+    productId: r.product_id,
+    customerId: r.customer_id,
+    customerName: r.customer_name,
+    customerAvatar: r.customer_avatar || "",
+    rating: r.rating,
+    comment: r.comment,
+    createdAt: r.created_at,
+    updatedAt: r.updated_at
+  };
+}
+
+export async function getCommentsByProductId(productId: string): Promise<ProductComment[]> {
+  const { data, error } = await supabaseAdmin
+    .from("product_comments")
+    .select("*")
+    .eq("product_id", productId)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data as ProductCommentRow[]).map(rowToProductComment);
+}
+
+export async function getCommentByCustomerForProduct(
+  productId: string,
+  customerId: string
+): Promise<ProductComment | null> {
+  const { data, error } = await supabaseAdmin
+    .from("product_comments")
+    .select("*")
+    .eq("product_id", productId)
+    .eq("customer_id", customerId)
+    .maybeSingle();
+  if (error) throw error;
+  return data ? rowToProductComment(data as ProductCommentRow) : null;
+}
+
+export async function addProductComment(input: {
+  productId: string;
+  customerId: string;
+  customerName: string;
+  customerAvatar?: string;
+  rating: number;
+  comment: string;
+}): Promise<ProductComment> {
+  const now = new Date().toISOString();
+  const row = {
+    id: `cm${Date.now()}${Math.random().toString(36).slice(2, 7)}`,
+    product_id: input.productId,
+    customer_id: input.customerId,
+    customer_name: input.customerName,
+    customer_avatar: input.customerAvatar || "",
+    rating: Math.min(5, Math.max(1, Math.round(input.rating))),
+    comment: input.comment.trim(),
+    created_at: now,
+    updated_at: now
+  };
+  const { data, error } = await supabaseAdmin.from("product_comments").insert(row).select().single();
+  if (error) throw error;
+  return rowToProductComment(data as ProductCommentRow);
+}
+
+export async function updateProductComment(
+  id: string,
+  customerId: string,
+  patch: { rating: number; comment: string }
+): Promise<ProductComment | null> {
+  const { data, error } = await supabaseAdmin
+    .from("product_comments")
+    .update({
+      rating: Math.min(5, Math.max(1, Math.round(patch.rating))),
+      comment: patch.comment.trim(),
+      updated_at: new Date().toISOString()
+    })
+    .eq("id", id)
+    .eq("customer_id", customerId)
+    .select()
+    .maybeSingle();
+  if (error) throw error;
+  return data ? rowToProductComment(data as ProductCommentRow) : null;
+}
+
+export async function deleteProductComment(id: string, customerId?: string): Promise<void> {
+  let query = supabaseAdmin.from("product_comments").delete().eq("id", id);
+  if (customerId) query = query.eq("customer_id", customerId);
+  const { error } = await query;
+  if (error) throw error;
+}
+
+export async function getAllProductComments(limit = 300): Promise<ProductComment[]> {
+  const { data, error } = await supabaseAdmin
+    .from("product_comments")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  if (error) throw error;
+  return (data as ProductCommentRow[]).map(rowToProductComment);
+}
+
+export async function getCommentStatsByProduct(): Promise<
+  Record<string, { count: number; avgRating: number }>
+> {
+  const { data, error } = await supabaseAdmin.from("product_comments").select("product_id, rating");
+  if (error) throw error;
+  const totals: Record<string, { count: number; total: number }> = {};
+  for (const row of (data || []) as { product_id: string; rating: number }[]) {
+    if (!totals[row.product_id]) totals[row.product_id] = { count: 0, total: 0 };
+    totals[row.product_id].count += 1;
+    totals[row.product_id].total += row.rating;
+  }
+  const result: Record<string, { count: number; avgRating: number }> = {};
+  for (const pid of Object.keys(totals)) {
+    result[pid] = {
+      count: totals[pid].count,
+      avgRating: Math.round((totals[pid].total / totals[pid].count) * 10) / 10
+    };
+  }
+  return result;
 }

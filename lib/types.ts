@@ -4,6 +4,8 @@ export type VariantOption = {
   id: string;
   name: string;
   price: number;
+  /** Optional "was" price. When set and higher than price, the product shows a strikethrough original price + % off badge. */
+  compareAtPrice?: number;
   stock: number;
 };
 
@@ -94,13 +96,15 @@ export type SiteSettings = {
   deliveryNote: string;
   facebookUrl: string;
   instagramUrl: string;
+  tiktokUrl: string;
+  youtubeUrl: string;
   logoUrl: string;
   logoSize: "small" | "medium" | "large";
   bannerImage: string;
   bannerBadge: string;
   bannerHeadline: string;
   bannerSubheading: string;
-  bannerTemplate: "classic" | "split" | "centered" | "card" | "gradient" | "carousel";
+  bannerTemplate: "classic" | "split" | "centered" | "card" | "gradient" | "carousel" | "magazine" | "overlay" | "wave";
   bannerSlides: BannerSlide[];
   primaryColor: string;
   accentColor: string;
@@ -111,8 +115,7 @@ export type SiteSettings = {
   showAboutPage: boolean;
   /** When false, /delivery is hidden from the site (admin can toggle). */
   showDeliveryPage: boolean;
-  /** Homepage offer banner (countdown promo). Optional — falls back to defaults when absent. */
-  offer?: OfferSettings;
+  offer: OfferSettings;
 };
 
 export type AdminPermissions = {
@@ -126,69 +129,5 @@ export type AdminUser = {
   username: string;
   isOwner: boolean;
   permissions: AdminPermissions;
-  createdAt: string;
-};
-
-// ---- customer accounts ----
-
-export type Customer = {
-  id: string;
-  name: string;
-  phone: string;
-  phoneCountryCode: string;
-  email: string;
-  passwordHash: string;
-  address: string;
-  deliveryArea: string;
-  notes: string;
-  avatarUrl: string;
-  emailVerified: boolean;
-  verificationCodeHash: string | null;
-  verificationExpiresAt: string | null;
-  verificationSentAt: string | null;
-  resetCodeHash: string | null;
-  resetExpiresAt: string | null;
-  resetSentAt: string | null;
-  lastLoginAt: string | null;
-  createdAt: string;
-  updatedAt: string;
-};
-
-// ---- product comments / reviews ----
-
-export type ProductComment = {
-  id: string;
-  productId: string;
-  customerId: string;
-  customerName: string;
-  customerAvatar: string;
-  rating: number;
-  comment: string;
-  createdAt: string;
-  updatedAt: string;
-};
-
-// ---- customer orders (activity log, WhatsApp checkout) ----
-
-export type CustomerOrderItem = {
-  productId: string;
-  slug: string;
-  name: string;
-  variantName: string;
-  price: number;
-  quantity: number;
-};
-
-export type CustomerOrder = {
-  id: string;
-  customerId: string | null;
-  customerName: string;
-  customerPhone: string;
-  customerEmail: string;
-  customerAddress: string;
-  deliveryArea: string;
-  items: CustomerOrderItem[];
-  totalPrice: number;
-  itemCount: number;
   createdAt: string;
 };

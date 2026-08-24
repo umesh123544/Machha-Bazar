@@ -4,6 +4,7 @@ import { useState } from "react";
 import { HelpCircle, Minus, Plus } from "lucide-react";
 import type { Product } from "@/lib/types";
 import { buildInquiryMessage, whatsappLink } from "@/lib/whatsapp";
+import { hasDiscount, discountPercent } from "@/lib/pricing";
 import AddToCartButton from "./AddToCartButton";
 import StockBadge from "./StockBadge";
 
@@ -34,8 +35,18 @@ export default function ProductOrderPanel({
       <p className="text-sm text-ink-muted mb-6">{product.shortDescription}</p>
 
       {variant && (
-        <div className="text-2xl font-medium text-plum mb-6">
-          Rs. {variant.price} <span className="text-sm text-ink-muted font-normal">/ {variant.name}</span>
+        <div className="flex items-center gap-3 mb-6">
+          <div className="text-2xl font-medium text-plum">
+            Rs. {variant.price} <span className="text-sm text-ink-muted font-normal">/ {variant.name}</span>
+          </div>
+          {hasDiscount(variant) && (
+            <>
+              <span className="text-base text-ink-muted line-through">Rs. {variant.compareAtPrice}</span>
+              <span className="bg-berry text-berry-text text-xs font-semibold px-2 py-0.5 rounded-full">
+                {discountPercent(variant)}% OFF
+              </span>
+            </>
+          )}
         </div>
       )}
 

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Plus, Trash2, Pencil, X } from "lucide-react";
 import type { Product, StockStatus, Category } from "@/lib/types";
+import { hasDiscount, discountPercent } from "@/lib/pricing";
 import ImageUploader from "@/components/ImageUploader";
 
 type FormState = {
@@ -17,6 +18,7 @@ type FormState = {
   isFeatured: boolean;
   isComingSoon: boolean;
   price: number;
+  compareAtPrice: number;
   image: string;
 };
 
@@ -32,6 +34,7 @@ const emptyForm: FormState = {
   isFeatured: false,
   isComingSoon: false,
   price: 0,
+  compareAtPrice: 0,
   image: ""
 };
 
@@ -95,6 +98,7 @@ export default function AdminProductsPage() {
       isFeatured: product.isFeatured,
       isComingSoon: product.isComingSoon,
       price: product.variants[0]?.price || 0,
+      compareAtPrice: product.variants[0]?.compareAtPrice || 0,
       image: product.image && !product.image.includes("fish-placeholder") ? product.image : ""
     });
     setShowForm(true);
@@ -118,6 +122,10 @@ export default function AdminProductsPage() {
       setError("Enter a valid price.");
       return;
     }
+    if (form.compareAtPrice && form.compareAtPrice <= form.price) {
+      setError("Original (before discount) price must be higher than the selling price.");
+      return;
+    }
     if (!form.categorySlug) {
       setError("Select a category.");
       return;
@@ -136,7 +144,15 @@ export default function AdminProductsPage() {
       isComingSoon: form.isComingSoon,
       image: form.image || undefined,
       galleryImages: form.image ? [form.image] : undefined,
-      variants: [{ id: "v1", name: "Pair", price: form.price, stock: 5 }]
+      variants: [
+        {
+          id: "v1",
+          name: "Pair",
+          price: form.price,
+          compareAtPrice: form.compareAtPrice > form.price ? form.compareAtPrice : undefined,
+          stock: 5
+        }
+      ]
     };
 
     const res = editingId
@@ -219,6 +235,14 @@ export default function AdminProductsPage() {
               value={form.price || ""}
               onChange={(e) => setForm({ ...form, price: Number(e.target.value) })}
               className="text-sm rounded-lg border border-cream-soft px-3 py-2.5"
+            />
+            <input
+              type="number"
+              placeholder="Original price before discount (optional)"
+              value={form.compareAtPrice || ""}
+              onChange={(e) => setForm({ ...form, compareAtPrice: Number(e.target.value) })}
+              className="text-sm rounded-lg border border-cream-soft px-3 py-2.5"
+              title="Leave blank for no discount. If filled, must be higher than Price — shows as a strikethrough price and % off badge on the shop."
             />
             <input
               placeholder="Size (e.g. Medium 3-4cm)"
@@ -309,6 +333,19 @@ export default function AdminProductsPage() {
                     >
                       {p.category}
                     </a>
+                    <div className="flex items-center gap-1.5 mt-1">
+                      <span className="text-xs font-medium text-plum">Rs. {p.variants[0]?.price ?? "-"}</span>
+                      {hasDiscount(p.variants[0]) && (
+                        <>
+                          <span className="text-[11px] text-ink-muted line-through">
+                            Rs. {p.variants[0]?.compareAtPrice}
+                          </span>
+                          <span className="text-[10px] font-semibold text-berry-dark">
+                            {discountPercent(p.variants[0])}% off
+                          </span>
+                        </>
+                      )}
+                    </div>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
                     <button
@@ -355,6 +392,7 @@ export default function AdminProductsPage() {
                 <tr className="text-left text-xs text-ink-muted border-b border-cream-soft">
                   <th className="px-4 py-3 font-medium">Name</th>
                   <th className="px-4 py-3 font-medium">Category</th>
+                  <th className="px-4 py-3 font-medium">Price</th>
                   <th className="px-4 py-3 font-medium">Stock</th>
                   <th className="px-4 py-3 font-medium">Active</th>
                   <th className="px-4 py-3 font-medium text-right">Actions</th>
@@ -373,6 +411,21 @@ export default function AdminProductsPage() {
                       >
                         {p.category}
                       </a>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-plum font-medium">Rs. {p.variants[0]?.price ?? "-"}</span>
+                        {hasDiscount(p.variants[0]) && (
+                          <>
+                            <span className="text-xs text-ink-muted line-through">
+                              Rs. {p.variants[0]?.compareAtPrice}
+                            </span>
+                            <span className="text-[10px] font-semibold text-berry-dark bg-[#FBEAEA] px-1.5 py-0.5 rounded-full">
+                              {discountPercent(p.variants[0])}% off
+                            </span>
+                          </>
+                        )}
+                      </div>
                     </td>
                     <td className="px-4 py-3">
                       <button
