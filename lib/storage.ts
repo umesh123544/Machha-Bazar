@@ -10,7 +10,7 @@ export async function uploadImage(
   buffer: Buffer,
   originalName: string,
   contentType: string,
-  folder: "products" | "banner" | "logo"
+  folder: "products" | "banner" | "logo" | "avatars"
 ): Promise<string> {
   const path = `${folder}/${Date.now()}-${sanitizeFilename(originalName || "image")}`;
 
