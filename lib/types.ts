@@ -70,6 +70,18 @@ export type BannerSlide = {
   subheading: string;
 };
 
+export type OfferSettings = {
+  enabled: boolean;
+  title: string;
+  subtitle: string;
+  badge: string;
+  ctaText: string;
+  ctaLink: string;
+  endsAt: string;
+  image: string;
+  template: "gradient" | "minimal" | "ribbon" | "split" | "ticket" | "bar";
+};
+
 export type SiteSettings = {
   businessName: string;
   tagline: string;
@@ -99,6 +111,8 @@ export type SiteSettings = {
   showAboutPage: boolean;
   /** When false, /delivery is hidden from the site (admin can toggle). */
   showDeliveryPage: boolean;
+  /** Homepage offer banner (countdown promo). Optional — falls back to defaults when absent. */
+  offer?: OfferSettings;
 };
 
 export type AdminPermissions = {
@@ -112,5 +126,69 @@ export type AdminUser = {
   username: string;
   isOwner: boolean;
   permissions: AdminPermissions;
+  createdAt: string;
+};
+
+// ---- customer accounts ----
+
+export type Customer = {
+  id: string;
+  name: string;
+  phone: string;
+  phoneCountryCode: string;
+  email: string;
+  passwordHash: string;
+  address: string;
+  deliveryArea: string;
+  notes: string;
+  avatarUrl: string;
+  emailVerified: boolean;
+  verificationCodeHash: string | null;
+  verificationExpiresAt: string | null;
+  verificationSentAt: string | null;
+  resetCodeHash: string | null;
+  resetExpiresAt: string | null;
+  resetSentAt: string | null;
+  lastLoginAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
+// ---- product comments / reviews ----
+
+export type ProductComment = {
+  id: string;
+  productId: string;
+  customerId: string;
+  customerName: string;
+  customerAvatar: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+// ---- customer orders (activity log, WhatsApp checkout) ----
+
+export type CustomerOrderItem = {
+  productId: string;
+  slug: string;
+  name: string;
+  variantName: string;
+  price: number;
+  quantity: number;
+};
+
+export type CustomerOrder = {
+  id: string;
+  customerId: string | null;
+  customerName: string;
+  customerPhone: string;
+  customerEmail: string;
+  customerAddress: string;
+  deliveryArea: string;
+  items: CustomerOrderItem[];
+  totalPrice: number;
+  itemCount: number;
   createdAt: string;
 };

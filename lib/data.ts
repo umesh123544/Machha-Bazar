@@ -1,5 +1,17 @@
 import { supabaseAdmin } from "./supabaseClient";
-import type { Product, Category, SiteSettings, AdminUser, AdminPermissions, HomepageContent, BannerSlide } from "./types";
+import type {
+  Product,
+  Category,
+  SiteSettings,
+  AdminUser,
+  AdminPermissions,
+  HomepageContent,
+  BannerSlide,
+  Customer,
+  ProductComment,
+  CustomerOrder,
+  CustomerOrderItem
+} from "./types";
 
 // ---- row <-> app-type mapping ----
 
@@ -256,6 +268,12 @@ export async function getProductBySlug(slug: string): Promise<Product | undefine
   return data ? rowToProduct(data as ProductRow) : undefined;
 }
 
+export async function getProductById(id: string): Promise<Product | undefined> {
+  const { data, error } = await supabaseAdmin.from("products").select("*").eq("id", id).maybeSingle();
+  if (error) throw error;
+  return data ? rowToProduct(data as ProductRow) : undefined;
+}
+
 export async function addProduct(product: Product): Promise<Product> {
   const { data, error } = await supabaseAdmin.from("products").insert(productToRow(product)).select().single();
   if (error) throw error;
@@ -390,4 +408,445 @@ export async function getAllPageContent(): Promise<PageContent[]> {
     image: r.image || "",
     updatedAt: r.updated_at,
   }));
+}
+
+// ---- customers ----
+
+type CustomerRow = {
+  id: string;
+  name: string;
+  phone: string;
+  phone_country_code: string;
+  email: string;
+  password_hash: string;
+  address: string;
+  delivery_area: string;
+  notes: string;
+  avatar_url: string | null;
+  email_verified: boolean;
+  verification_code_hash: string | null;
+  verification_expires_at: string | null;
+  verification_sent_at: string | null;
+  reset_code_hash: string | null;
+  reset_expires_at: string | null;
+  reset_sent_at: string | null;
+  last_login_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+function rowToCustomer(r: CustomerRow): Customer {
+  return {
+    id: r.id,
+    name: r.name || "",
+    phone: r.phone || "",
+    phoneCountryCode: r.phone_country_code || "+977",
+    email: r.email,
+    passwordHash: r.password_hash,
+    address: r.address || "",
+    deliveryArea: r.delivery_area || "",
+    notes: r.notes || "",
+    avatarUrl: r.avatar_url || "",
+    emailVerified: !!r.email_verified,
+    verificationCodeHash: r.verification_code_hash,
+    verificationExpiresAt: r.verification_expires_at,
+    verificationSentAt: r.verification_sent_at,
+    resetCodeHash: r.reset_code_hash,
+    resetExpiresAt: r.reset_expires_at,
+    resetSentAt: r.reset_sent_at,
+    lastLoginAt: r.last_login_at,
+    createdAt: r.created_at,
+    updatedAt: r.updated_at
+  };
+}
+
+export async function getAllCustomers(): Promise<Customer[]> {
+  const { data, error } = await supabaseAdmin
+    .from("customers")
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data as CustomerRow[]).map(rowToCustomer);
+}
+
+export async function getCustomerById(id: string): Promise<Customer | undefined> {
+  const { data, error } = await supabaseAdmin.from("customers").select("*").eq("id", id).maybeSingle();
+  if (error) throw error;
+  return data ? rowToCustomer(data as CustomerRow) : undefined;
+}
+
+export async function getCustomerByEmail(email: string): Promise<Customer | undefined> {
+  const { data, error } = await supabaseAdmin
+    .from("customers")
+    .select("*")
+    .eq("email", email.toLowerCase().trim())
+    .maybeSingle();
+  if (error) throw error;
+  return data ? rowToCustomer(data as CustomerRow) : undefined;
+}
+
+export async function createCustomer(input: {
+  name: string;
+  phone?: string;
+  phoneCountryCode?: string;
+  email: string;
+  passwordHash: string;
+  address?: string;
+  deliveryArea?: string;
+  emailVerified?: boolean;
+  verificationCodeHash?: string;
+  verificationExpiresAt?: string;
+}): Promise<Customer> {
+  const now = new Date().toISOString();
+  const row = {
+    id: `c${Date.now()}`,
+    name: input.name,
+    phone: input.phone || "",
+    phone_country_code: input.phoneCountryCode || "+977",
+    email: input.email.toLowerCase().trim(),
+    password_hash: input.passwordHash,
+    address: input.address || "",
+    delivery_area: input.deliveryArea || "",
+    notes: "",
+    avatar_url: "",
+    email_verified: input.emailVerified ?? false,
+    verification_code_hash: input.verificationCodeHash || null,
+    verification_expires_at: input.verificationExpiresAt || null,
+    verification_sent_at: input.verificationCodeHash ? now : null,
+    created_at: now,
+    updated_at: now
+  };
+  const { data, error } = await supabaseAdmin.from("customers").insert(row).select().single();
+  if (error) throw error;
+  return rowToCustomer(data as CustomerRow);
+}
+
+export async function updateCustomer(
+  id: string,
+  patch: Partial<{
+    name: string;
+    phone: string;
+    phoneCountryCode: string;
+    address: string;
+    deliveryArea: string;
+    notes: string;
+    avatarUrl: string;
+  }>
+): Promise<Customer | undefined> {
+  const row: Record<string, unknown> = { updated_at: new Date().toISOString() };
+  if (patch.name !== undefined) row.name = patch.name;
+  if (patch.phone !== undefined) row.phone = patch.phone;
+  if (patch.phoneCountryCode !== undefined) row.phone_country_code = patch.phoneCountryCode;
+  if (patch.address !== undefined) row.address = patch.address;
+  if (patch.deliveryArea !== undefined) row.delivery_area = patch.deliveryArea;
+  if (patch.notes !== undefined) row.notes = patch.notes;
+  if (patch.avatarUrl !== undefined) row.avatar_url = patch.avatarUrl;
+
+  const { data, error } = await supabaseAdmin.from("customers").update(row).eq("id", id).select().maybeSingle();
+  if (error) throw error;
+  return data ? rowToCustomer(data as CustomerRow) : undefined;
+}
+
+export async function deleteCustomer(id: string): Promise<void> {
+  const { error } = await supabaseAdmin.from("customers").delete().eq("id", id);
+  if (error) throw error;
+}
+
+export async function touchCustomerLogin(id: string): Promise<void> {
+  const { error } = await supabaseAdmin
+    .from("customers")
+    .update({ last_login_at: new Date().toISOString() })
+    .eq("id", id);
+  if (error) throw error;
+}
+
+// ---- customer email verification ----
+
+export async function getCustomerVerificationState(email: string): Promise<{
+  name: string;
+  emailVerified: boolean;
+  verificationCodeHash: string | null;
+  verificationExpiresAt: string | null;
+  verificationSentAt: string | null;
+} | null> {
+  const customer = await getCustomerByEmail(email);
+  if (!customer) return null;
+  return {
+    name: customer.name,
+    emailVerified: customer.emailVerified,
+    verificationCodeHash: customer.verificationCodeHash,
+    verificationExpiresAt: customer.verificationExpiresAt,
+    verificationSentAt: customer.verificationSentAt
+  };
+}
+
+export async function setCustomerVerificationCode(
+  email: string,
+  codeHash: string,
+  expiresAt: string
+): Promise<void> {
+  const { error } = await supabaseAdmin
+    .from("customers")
+    .update({
+      verification_code_hash: codeHash,
+      verification_expires_at: expiresAt,
+      verification_sent_at: new Date().toISOString()
+    })
+    .eq("email", email.toLowerCase().trim());
+  if (error) throw error;
+}
+
+export async function markCustomerEmailVerified(email: string): Promise<void> {
+  const { error } = await supabaseAdmin
+    .from("customers")
+    .update({
+      email_verified: true,
+      verification_code_hash: null,
+      verification_expires_at: null
+    })
+    .eq("email", email.toLowerCase().trim());
+  if (error) throw error;
+}
+
+// ---- customer password reset ----
+
+export async function getCustomerResetState(email: string): Promise<{
+  name: string;
+  resetCodeHash: string | null;
+  resetExpiresAt: string | null;
+  resetSentAt: string | null;
+} | null> {
+  const customer = await getCustomerByEmail(email);
+  if (!customer) return null;
+  return {
+    name: customer.name,
+    resetCodeHash: customer.resetCodeHash,
+    resetExpiresAt: customer.resetExpiresAt,
+    resetSentAt: customer.resetSentAt
+  };
+}
+
+export async function setCustomerResetCode(email: string, codeHash: string, expiresAt: string): Promise<void> {
+  const { error } = await supabaseAdmin
+    .from("customers")
+    .update({
+      reset_code_hash: codeHash,
+      reset_expires_at: expiresAt,
+      reset_sent_at: new Date().toISOString()
+    })
+    .eq("email", email.toLowerCase().trim());
+  if (error) throw error;
+}
+
+export async function resetCustomerPassword(email: string, passwordHash: string): Promise<void> {
+  const { error } = await supabaseAdmin
+    .from("customers")
+    .update({
+      password_hash: passwordHash,
+      reset_code_hash: null,
+      reset_expires_at: null
+    })
+    .eq("email", email.toLowerCase().trim());
+  if (error) throw error;
+}
+
+// ---- product comments / reviews ----
+
+type ProductCommentRow = {
+  id: string;
+  product_id: string;
+  customer_id: string;
+  customer_name: string;
+  customer_avatar: string;
+  rating: number;
+  comment: string;
+  created_at: string;
+  updated_at: string;
+};
+
+function rowToComment(r: ProductCommentRow): ProductComment {
+  return {
+    id: r.id,
+    productId: r.product_id,
+    customerId: r.customer_id,
+    customerName: r.customer_name || "",
+    customerAvatar: r.customer_avatar || "",
+    rating: r.rating,
+    comment: r.comment || "",
+    createdAt: r.created_at,
+    updatedAt: r.updated_at
+  };
+}
+
+export async function getAllProductComments(): Promise<ProductComment[]> {
+  const { data, error } = await supabaseAdmin
+    .from("product_comments")
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data as ProductCommentRow[]).map(rowToComment);
+}
+
+export async function getCommentsByProductId(productId: string): Promise<ProductComment[]> {
+  const { data, error } = await supabaseAdmin
+    .from("product_comments")
+    .select("*")
+    .eq("product_id", productId)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data as ProductCommentRow[]).map(rowToComment);
+}
+
+export async function getCommentByCustomerForProduct(
+  productId: string,
+  customerId: string
+): Promise<ProductComment | undefined> {
+  const { data, error } = await supabaseAdmin
+    .from("product_comments")
+    .select("*")
+    .eq("product_id", productId)
+    .eq("customer_id", customerId)
+    .maybeSingle();
+  if (error) throw error;
+  return data ? rowToComment(data as ProductCommentRow) : undefined;
+}
+
+export async function addProductComment(input: {
+  productId: string;
+  customerId: string;
+  customerName: string;
+  customerAvatar?: string;
+  rating: number;
+  comment: string;
+}): Promise<ProductComment> {
+  const now = new Date().toISOString();
+  const row = {
+    id: `pc${Date.now()}`,
+    product_id: input.productId,
+    customer_id: input.customerId,
+    customer_name: input.customerName,
+    customer_avatar: input.customerAvatar || "",
+    rating: input.rating,
+    comment: input.comment,
+    created_at: now,
+    updated_at: now
+  };
+  const { data, error } = await supabaseAdmin.from("product_comments").insert(row).select().single();
+  if (error) throw error;
+  return rowToComment(data as ProductCommentRow);
+}
+
+export async function updateProductComment(
+  id: string,
+  customerId: string,
+  patch: { rating: number; comment: string }
+): Promise<ProductComment | undefined> {
+  const { data, error } = await supabaseAdmin
+    .from("product_comments")
+    .update({ rating: patch.rating, comment: patch.comment, updated_at: new Date().toISOString() })
+    .eq("id", id)
+    .eq("customer_id", customerId)
+    .select()
+    .maybeSingle();
+  if (error) throw error;
+  return data ? rowToComment(data as ProductCommentRow) : undefined;
+}
+
+export async function deleteProductComment(id: string, customerId?: string): Promise<void> {
+  let query = supabaseAdmin.from("product_comments").delete().eq("id", id);
+  if (customerId) query = query.eq("customer_id", customerId);
+  const { error } = await query;
+  if (error) throw error;
+}
+
+// ---- customer orders (activity log) ----
+
+type CustomerOrderRow = {
+  id: string;
+  customer_id: string | null;
+  customer_name: string;
+  customer_phone: string;
+  customer_email: string;
+  customer_address: string;
+  delivery_area: string;
+  items: CustomerOrderItem[];
+  total_price: number;
+  item_count: number;
+  created_at: string;
+};
+
+function rowToOrder(r: CustomerOrderRow): CustomerOrder {
+  return {
+    id: r.id,
+    customerId: r.customer_id,
+    customerName: r.customer_name || "",
+    customerPhone: r.customer_phone || "",
+    customerEmail: r.customer_email || "",
+    customerAddress: r.customer_address || "",
+    deliveryArea: r.delivery_area || "",
+    items: r.items || [],
+    totalPrice: r.total_price || 0,
+    itemCount: r.item_count || 0,
+    createdAt: r.created_at
+  };
+}
+
+export async function createCustomerOrder(input: {
+  customerId: string | null;
+  customerName: string;
+  customerPhone: string;
+  customerEmail: string;
+  customerAddress: string;
+  deliveryArea: string;
+  items: CustomerOrderItem[];
+  totalPrice: number;
+}): Promise<CustomerOrder> {
+  const itemCount = input.items.reduce((sum, i) => sum + (Number(i.quantity) || 0), 0);
+  const row = {
+    id: `o${Date.now()}`,
+    customer_id: input.customerId,
+    customer_name: input.customerName,
+    customer_phone: input.customerPhone,
+    customer_email: input.customerEmail,
+    customer_address: input.customerAddress,
+    delivery_area: input.deliveryArea,
+    items: input.items,
+    total_price: input.totalPrice,
+    item_count: itemCount,
+    created_at: new Date().toISOString()
+  };
+  const { data, error } = await supabaseAdmin.from("customer_orders").insert(row).select().single();
+  if (error) throw error;
+  return rowToOrder(data as CustomerOrderRow);
+}
+
+export async function getOrdersByCustomerId(customerId: string): Promise<CustomerOrder[]> {
+  const { data, error } = await supabaseAdmin
+    .from("customer_orders")
+    .select("*")
+    .eq("customer_id", customerId)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data as CustomerOrderRow[]).map(rowToOrder);
+}
+
+export async function getAllCustomerOrders(limit = 50): Promise<CustomerOrder[]> {
+  const { data, error } = await supabaseAdmin
+    .from("customer_orders")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  if (error) throw error;
+  return (data as CustomerOrderRow[]).map(rowToOrder);
+}
+
+export async function getCustomerOrderCounts(): Promise<Record<string, number>> {
+  const { data, error } = await supabaseAdmin.from("customer_orders").select("customer_id");
+  if (error) throw error;
+  const counts: Record<string, number> = {};
+  for (const row of data as { customer_id: string | null }[]) {
+    if (!row.customer_id) continue;
+    counts[row.customer_id] = (counts[row.customer_id] || 0) + 1;
+  }
+  return counts;
 }

@@ -1,12 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateOtp, hashOtp, VERIFICATION_TTL_MS } from "@/lib/otp";
 import { sendPasswordResetEmail } from "@/lib/email";
+import { adminResetStore } from "@/lib/admin-reset-store";
 
 export const dynamic = "force-dynamic";
-
-// In-memory OTP store for admin reset (same process, expires in 10 min)
-// Keyed by username so multiple admins can reset independently.
-export const adminResetStore = new Map<string, { hash: string; expiresAt: number }>();
 
 export async function POST(req: NextRequest) {
   const { username } = await req.json();
