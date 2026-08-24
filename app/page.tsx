@@ -26,8 +26,8 @@ const ICON_MAP: Record<string, LucideIcon> = {
 
 export default async function HomePage() {
   const products = await getActiveProducts();
-  const featured = products.filter((p) => p.isFeatured).slice(0, 3);
-  const shown = featured.length ? featured : products.slice(0, 3);
+  const featured = products.filter((p) => p.isFeatured).slice(0, 4);
+  const shown = featured.length ? featured : products.slice(0, 4);
   const categories = await getCategories();
   const comingSoon = categories.filter((c) => c.comingSoon);
   const settings = await getSiteSettings();
@@ -59,7 +59,7 @@ export default async function HomePage() {
             See all
           </Link>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
           {shown.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}

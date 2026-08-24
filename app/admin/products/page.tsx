@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Plus, Trash2, Pencil, X } from "lucide-react";
 import type { Product, StockStatus, Category } from "@/lib/types";
 import { hasDiscount, discountPercent } from "@/lib/pricing";
@@ -46,6 +46,16 @@ export default function AdminProductsPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm);
   const [error, setError] = useState("");
+  const formRef = useRef<HTMLFormElement>(null);
+
+  // Whenever the form opens (add or edit — including editing the last product
+  // in a long list), scroll it into view instead of leaving the user stuck
+  // looking at a form that opened off-screen above the fold.
+  useEffect(() => {
+    if (showForm) {
+      formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [showForm, editingId]);
 
   async function load() {
     setLoading(true);
@@ -216,7 +226,7 @@ export default function AdminProductsPage() {
       </div>
 
       {showForm && (
-        <form onSubmit={handleSubmit} className="bg-white border border-cream-soft rounded-xl p-5 mb-6 space-y-3">
+        <form ref={formRef} onSubmit={handleSubmit} className="bg-white border border-cream-soft rounded-xl p-5 mb-6 space-y-3">
           <p className="text-sm font-medium text-plum">{editingId ? "Edit product" : "New product"}</p>
           <div>
             <label className="text-xs text-ink-muted mb-1 block">Photo</label>
