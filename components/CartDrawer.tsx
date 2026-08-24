@@ -17,28 +17,6 @@ export default function CartDrawer({
 
   const checkoutUrl = whatsappLink(whatsappNumber, buildCartOrderMessage(businessName, items));
 
-  async function handleCheckout() {
-    try {
-      await fetch("/api/orders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          items: items.map((i) => ({
-            productId: i.productId,
-            slug: i.slug,
-            name: i.name,
-            variantName: i.variantName,
-            price: i.price,
-            quantity: i.quantity
-          }))
-        })
-      });
-    } catch {
-      // still open WhatsApp even if logging fails
-    }
-    setTimeout(clearCart, 500);
-  }
-
   return (
     <div className="fixed inset-0 z-50 flex justify-end">
       <div className="absolute inset-0 bg-black/40" onClick={closeCart} />
@@ -110,7 +88,7 @@ export default function CartDrawer({
               href={checkoutUrl}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={handleCheckout}
+              onClick={() => setTimeout(clearCart, 500)}
               className="flex items-center justify-center gap-2 bg-berry hover:bg-berry-dark text-berry-text text-sm font-medium rounded-lg py-3 w-full transition-colors"
             >
               <MessageCircle size={16} />

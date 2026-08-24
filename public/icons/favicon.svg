@@ -1,18 +1,8 @@
 <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#3B2145"/>
-      <stop offset="1" stop-color="#231327"/>
-    </linearGradient>
-    <linearGradient id="fish" x1="18" y1="22" x2="50" y2="40" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#F8CE72"/>
-      <stop offset="1" stop-color="#E0A430"/>
-    </linearGradient>
-  </defs>
-  <rect width="64" height="64" rx="14" fill="url(#bg)"/>
-  <g transform="translate(32 32) scale(0.86) translate(-32 -32)">
-    <path d="M 21 32 C 15.5 25.5 9 22 3 20 C 7 26 8 29.5 8 32 C 8 34.5 7 38 3 44 C 9 42 15.5 38.5 21 32 Z" fill="#E0A430"/>
-    <ellipse cx="34" cy="32" rx="16" ry="10" fill="url(#fish)"/>
-    <circle cx="43" cy="28" r="2.6" fill="#FFF8EC"/>
+  <rect width="64" height="64" rx="14" fill="#2B1B33"/>
+  <g transform="translate(38,32)">
+    <ellipse cx="0" cy="0" rx="16" ry="9" fill="#F0B84C"/>
+    <polygon points="-16,0 -27,-9 -27,9" fill="#F0B84C"/>
+    <circle cx="7" cy="-2" r="2" fill="#FAF6EF"/>
   </g>
 </svg>

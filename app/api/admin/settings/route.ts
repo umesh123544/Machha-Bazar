@@ -19,14 +19,7 @@ export async function PUT(request: NextRequest) {
 
   const body = (await request.json()) as Partial<SiteSettings>;
   const current = await getSiteSettings();
-  const merged: SiteSettings = {
-    ...current,
-    ...body,
-    offer: body.offer ? { ...current.offer, ...body.offer } : current.offer,
-    homepageContent: body.homepageContent
-      ? { ...current.homepageContent, ...body.homepageContent }
-      : current.homepageContent
-  };
+  const merged: SiteSettings = { ...current, ...body };
   await saveSiteSettings(merged);
 
   // यो थपियो:
