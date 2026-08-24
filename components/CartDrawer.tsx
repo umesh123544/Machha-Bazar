@@ -111,7 +111,7 @@ export default function CartDrawer({
               target="_blank"
               rel="noopener noreferrer"
               onClick={handleCheckout}
-              className="flex items-center justify-center gap-2 bg-berry hover:bg-berry-dark text-berry-text text-sm font-medium rounded-lg py-3 w-full transition-colors"
+              className="flex items-center justify-center gap-2 bg-berry hover:bg-berry-dark text-white text-sm font-medium rounded-lg py-3 w-full transition-colors"
             >
               <MessageCircle size={16} />
               Checkout via WhatsApp

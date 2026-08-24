@@ -1082,7 +1082,7 @@ export default function AccountPage() {
             <p className="text-sm text-ink-muted mb-3">Your cart is empty.</p>
             <Link
               href="/shop"
-              className="inline-block text-sm font-medium bg-berry hover:bg-berry-dark text-berry-text rounded-xl px-5 py-2.5"
+              className="inline-block text-sm font-medium bg-berry hover:bg-berry-dark text-white rounded-xl px-5 py-2.5"
             >
               Browse shop
             </Link>
@@ -1139,7 +1139,7 @@ export default function AccountPage() {
             <button
               type="button"
               onClick={openCart}
-              className="w-full text-sm font-medium bg-berry hover:bg-berry-dark text-berry-text rounded-xl py-3"
+              className="w-full text-sm font-medium bg-berry hover:bg-berry-dark text-white rounded-xl py-3"
             >
               Order via WhatsApp
             </button>

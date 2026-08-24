@@ -170,7 +170,7 @@ export default function OfferBanner({ offer }: { offer: OfferSettings }) {
             </div>
             <Link
               href={offer.ctaLink || "/shop"}
-              className="inline-flex items-center justify-center gap-2 bg-berry hover:bg-berry-dark text-berry-text text-sm font-medium px-6 py-3 rounded-lg transition-colors flex-shrink-0"
+              className="inline-flex items-center justify-center gap-2 bg-berry hover:bg-berry-dark text-white text-sm font-medium px-6 py-3 rounded-lg transition-colors flex-shrink-0"
             >
               {offer.ctaText || "Shop now"}
               <ArrowRight size={16} />
@@ -224,7 +224,7 @@ export default function OfferBanner({ offer }: { offer: OfferSettings }) {
           {offer.endsAt && <div className="mb-5"><Countdown endsAt={offer.endsAt} tone="dark" /></div>}
           <Link
             href={offer.ctaLink || "/shop"}
-            className="inline-flex w-fit items-center gap-2 bg-berry hover:bg-berry-dark text-berry-text text-sm font-medium px-5 py-2.5 rounded-lg transition-colors"
+            className="inline-flex w-fit items-center gap-2 bg-berry hover:bg-berry-dark text-white text-sm font-medium px-5 py-2.5 rounded-lg transition-colors"
           >
             {offer.ctaText || "Shop now"}
           </Link>

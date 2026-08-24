@@ -45,7 +45,7 @@ export default function AddToCartButton({
       onClick={handleAdd}
       className={
         className ||
-        "flex-1 flex items-center justify-center gap-2 bg-berry hover:bg-berry-dark text-berry-text text-sm font-medium rounded-lg py-3 transition-colors"
+        "flex-1 flex items-center justify-center gap-2 bg-berry hover:bg-berry-dark text-white text-sm font-medium rounded-lg py-3 transition-colors"
       }
     >
       {justAdded ? <Check size={16} /> : <ShoppingCart size={16} />}

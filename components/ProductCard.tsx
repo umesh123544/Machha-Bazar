@@ -67,7 +67,7 @@ export default function ProductCard({ product }: { product: Product }) {
             <AddToCartButton
               product={product}
               variant={lowestVariant}
-              className="flex-1 flex items-center justify-center gap-1.5 text-sm font-medium bg-berry hover:bg-berry-dark text-berry-text rounded-lg py-2 transition-colors"
+              className="flex-1 flex items-center justify-center gap-1.5 text-sm font-medium bg-berry hover:bg-berry-dark text-white rounded-lg py-2 transition-colors"
               label="Add"
             />
           </div>

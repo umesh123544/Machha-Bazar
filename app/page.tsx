@@ -137,7 +137,7 @@ export default async function HomePage() {
           href={whatsappLink(settings.whatsappNumber, buildInquiryMessage(settings.businessName, "a specific fish"))}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 bg-berry hover:bg-berry-dark text-berry-text text-sm font-medium px-6 py-3 rounded-lg"
+          className="inline-flex items-center gap-2 bg-berry hover:bg-berry-dark text-white text-sm font-medium px-6 py-3 rounded-lg"
         >
           <MessageCircle size={16} />
           Chat on WhatsApp

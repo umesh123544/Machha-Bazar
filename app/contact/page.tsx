@@ -36,7 +36,7 @@ export default async function ContactPage() {
         href={`https://wa.me/${settings.whatsappNumber}`}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center justify-center gap-2 bg-berry hover:bg-berry-dark text-berry-text text-sm font-medium rounded-lg py-3 mb-10"
+        className="flex items-center justify-center gap-2 bg-berry hover:bg-berry-dark text-white text-sm font-medium rounded-lg py-3 mb-10"
       >
         <MessageCircle size={16} />
         Chat With Us

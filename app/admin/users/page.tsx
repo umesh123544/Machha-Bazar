@@ -76,7 +76,7 @@ export default function AdminUsersPage() {
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="flex items-center gap-2 bg-berry hover:bg-berry-dark text-berry-text text-sm font-medium px-4 py-2 rounded-lg"
+          className="flex items-center gap-2 bg-berry hover:bg-berry-dark text-white text-sm font-medium px-4 py-2 rounded-lg"
         >
           {showForm ? <X size={16} /> : <Plus size={16} />}
           {showForm ? "Close" : "Add user"}

@@ -236,7 +236,7 @@ function CtaButtons({ whatsappNumber, variant }: { whatsappNumber: string; varia
     <>
       <Link
         href="/shop"
-        className="bg-berry hover:bg-berry-dark text-berry-text text-sm font-medium px-6 py-3 rounded-lg transition-colors"
+        className="bg-berry hover:bg-berry-dark text-white text-sm font-medium px-6 py-3 rounded-lg transition-colors"
       >
         Shop Available Fish
       </Link>
