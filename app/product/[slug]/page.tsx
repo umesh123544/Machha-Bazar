@@ -13,9 +13,28 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   if (!product) return { title: "Fish Not Found" };
   const settings = await getSiteSettings();
   const name = settings.businessName || "Maccha Bazar";
+  const description = `${product.shortDescription} Home-bred and available with Kathmandu Valley delivery from ${name}.`;
+  const hasPhoto = product.image && !product.image.includes("fish-placeholder");
   return {
     title: `${product.name} | ${name}`,
-    description: `${product.shortDescription} Home-bred and available with Kathmandu Valley delivery from ${name}.`
+    description,
+    openGraph: {
+      title: product.name,
+      description,
+      type: "website",
+      images: [
+        {
+          url: hasPhoto ? product.image : "/icons/icon-512.png",
+          alt: product.name
+        }
+      ]
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: product.name,
+      description,
+      images: [hasPhoto ? product.image : "/icons/icon-512.png"]
+    }
   };
 }
 

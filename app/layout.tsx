@@ -30,7 +30,21 @@ export async function generateMetadata(): Promise<Metadata> {
       description: "Healthy Fish. Beautiful Aquariums. Kathmandu Valley delivery.",
       url: siteUrl,
       siteName: name,
-      type: "website"
+      type: "website",
+      images: [
+        {
+          url: "/icons/icon-512.png",
+          width: 512,
+          height: 512,
+          alt: `${name} logo`
+        }
+      ]
+    },
+    twitter: {
+      card: "summary",
+      title: name,
+      description: "Healthy Fish. Beautiful Aquariums. Kathmandu Valley delivery.",
+      images: ["/icons/icon-512.png"]
     }
   };
 }
