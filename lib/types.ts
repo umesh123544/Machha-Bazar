@@ -100,7 +100,7 @@ export type SiteSettings = {
   bannerBadge: string;
   bannerHeadline: string;
   bannerSubheading: string;
-  bannerTemplate: "classic" | "split" | "centered" | "card" | "gradient" | "carousel" | "magazine" | "overlay" | "wave";
+  bannerTemplate: "classic" | "split" | "centered" | "card" | "gradient" | "carousel";
   bannerSlides: BannerSlide[];
   primaryColor: string;
   accentColor: string;
@@ -111,7 +111,8 @@ export type SiteSettings = {
   showAboutPage: boolean;
   /** When false, /delivery is hidden from the site (admin can toggle). */
   showDeliveryPage: boolean;
-  offer: OfferSettings;
+  /** Homepage offer banner (countdown promo). Optional — falls back to defaults in the admin UI. */
+  offer?: OfferSettings;
 };
 
 export type AdminPermissions = {
@@ -126,4 +127,64 @@ export type AdminUser = {
   isOwner: boolean;
   permissions: AdminPermissions;
   createdAt: string;
+};
+
+// ---- customer accounts, orders, product comments ----
+
+export type Customer = {
+  id: string;
+  name: string;
+  phone: string;
+  phoneCountryCode: string;
+  email: string;
+  passwordHash: string;
+  address: string;
+  deliveryArea: string;
+  notes: string;
+  avatarUrl: string;
+  emailVerified: boolean;
+  verificationCodeHash: string | null;
+  verificationExpiresAt: string | null;
+  verificationSentAt: string | null;
+  resetCodeHash: string | null;
+  resetExpiresAt: string | null;
+  resetSentAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  lastLoginAt: string | null;
+};
+
+export type OrderItem = {
+  productId: string;
+  slug: string;
+  name: string;
+  variantName: string;
+  price: number;
+  quantity: number;
+};
+
+export type CustomerOrder = {
+  id: string;
+  customerId: string | null;
+  customerName: string;
+  customerPhone: string;
+  customerEmail: string;
+  customerAddress: string;
+  deliveryArea: string;
+  items: OrderItem[];
+  totalPrice: number;
+  itemCount: number;
+  createdAt: string;
+};
+
+export type ProductComment = {
+  id: string;
+  productId: string;
+  customerId: string;
+  customerName: string;
+  customerAvatar: string;
+  rating: number;
+  comment: string;
+  createdAt: string;
+  updatedAt: string;
 };

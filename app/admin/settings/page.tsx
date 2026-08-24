@@ -124,6 +124,40 @@ export default function AdminSettingsPage() {
 
       <form onSubmit={handleSave} className="space-y-8">
         <section className="bg-white border border-cream-soft rounded-xl p-5 space-y-3">
+          <h2 className="text-sm font-medium text-plum mb-1">Logo</h2>
+          <p className="text-[11px] text-ink-muted -mt-2 mb-1">
+            Upload a logo to show it instead of the plain business name in the header and footer. Remove the image to fall back to text.
+          </p>
+          <div className="max-w-xs">
+            <ImageUploader value={settings.logoUrl} onChange={(url) => update("logoUrl", url)} scope="logo" />
+          </div>
+          <div>
+            <label className="text-xs text-ink-muted mb-2 block">Logo size</label>
+            <div className="flex gap-2">
+              {(["small", "medium", "large"] as const).map((size) => (
+                <button
+                  key={size}
+                  type="button"
+                  onClick={() => update("logoSize", size)}
+                  className={`flex-1 flex flex-col items-center gap-1.5 border rounded-lg py-3 capitalize text-xs font-medium text-plum ${
+                    settings.logoSize === size ? "border-berry ring-1 ring-berry" : "border-cream-soft"
+                  }`}
+                >
+                  <span
+                    className="bg-plum/80 rounded-sm"
+                    style={{
+                      height: size === "small" ? 14 : size === "large" ? 26 : 20,
+                      width: size === "small" ? 28 : size === "large" ? 52 : 40
+                    }}
+                  />
+                  {size}
+                </button>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-white border border-cream-soft rounded-xl p-5 space-y-3">
           <h2 className="text-sm font-medium text-plum mb-1">Homepage banner</h2>
           <div>
             <label className="text-xs text-ink-muted mb-2 block">Banner layout</label>
@@ -230,58 +264,6 @@ export default function AdminSettingsPage() {
                 <div className="text-xs font-medium text-plum">Carousel (swipe)</div>
                 <div className="text-[11px] text-ink-muted">Up to 5 slides, swipe or auto-advance.</div>
               </button>
-
-              <button
-                type="button"
-                onClick={() => update("bannerTemplate", "magazine")}
-                className={`text-left border rounded-lg p-3 ${
-                  settings.bannerTemplate === "magazine" ? "border-berry ring-1 ring-berry" : "border-cream-soft"
-                }`}
-              >
-                <div className="h-14 rounded-md bg-cream mb-2 flex overflow-hidden border border-cream-soft">
-                  <div className="w-3/5 bg-plum" />
-                  <div className="w-2/5 flex flex-col justify-center gap-1 px-1.5">
-                    <div className="h-1 w-2/3 bg-plum/50 rounded-full" />
-                    <div className="h-1.5 w-full bg-plum/30 rounded-full" />
-                  </div>
-                </div>
-                <div className="text-xs font-medium text-plum">Magazine</div>
-                <div className="text-[11px] text-ink-muted">Editorial layout — photo + story text.</div>
-              </button>
-              <button
-                type="button"
-                onClick={() => update("bannerTemplate", "overlay")}
-                className={`text-left border rounded-lg p-3 ${
-                  settings.bannerTemplate === "overlay" ? "border-berry ring-1 ring-berry" : "border-cream-soft"
-                }`}
-              >
-                <div className="h-14 rounded-md bg-plum mb-2 flex items-end p-1.5 relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-                  <div className="relative space-y-1 w-full">
-                    <div className="h-1.5 w-1/3 bg-amber rounded-full" />
-                    <div className="h-2 w-2/3 bg-cream/90 rounded-full" />
-                  </div>
-                </div>
-                <div className="text-xs font-medium text-plum">Overlay</div>
-                <div className="text-[11px] text-ink-muted">Full-bleed photo with text at the bottom.</div>
-              </button>
-              <button
-                type="button"
-                onClick={() => update("bannerTemplate", "wave")}
-                className={`text-left border rounded-lg p-3 ${
-                  settings.bannerTemplate === "wave" ? "border-berry ring-1 ring-berry" : "border-cream-soft"
-                }`}
-              >
-                <div className="h-14 rounded-md bg-plum mb-2 relative overflow-hidden flex items-center px-2">
-                  <div className="w-1/2 space-y-1 relative z-10">
-                    <div className="h-1.5 w-2/3 bg-amber/70 rounded-full" />
-                    <div className="h-2 w-full bg-cream/80 rounded-full" />
-                  </div>
-                  <div className="absolute bottom-0 left-0 right-0 h-3 bg-cream/10 rounded-t-full" />
-                </div>
-                <div className="text-xs font-medium text-plum">Wave</div>
-                <div className="text-[11px] text-ink-muted">Soft wave accent, modern brand style.</div>
-              </button>
             </div>
           </div>
 
@@ -376,42 +358,6 @@ export default function AdminSettingsPage() {
           <p className="text-[11px] text-ink-muted -mt-2">
             Changes apply across the whole site — header, buttons, badges, and admin panel.
           </p>
-
-          <div>
-            <label className="text-xs text-ink-muted mb-2 block">Ready-made themes</label>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
-              {[
-                { name: "Plum Berry", primary: "#2B1B33", accent: "#D65E8C", highlight: "#F0B84C" },
-                { name: "Ocean Teal", primary: "#0F2C3A", accent: "#1E9B8E", highlight: "#F0B84C" },
-                { name: "Forest", primary: "#1A2E1A", accent: "#3D8B5F", highlight: "#C9A227" },
-                { name: "Midnight Blue", primary: "#12182B", accent: "#4A6CF7", highlight: "#F5C542" },
-                { name: "Coral Sunset", primary: "#2A1520", accent: "#E85A4F", highlight: "#F7B733" },
-                { name: "Lavender", primary: "#2A2240", accent: "#9B7EDE", highlight: "#F0B84C" }
-              ].map((theme) => (
-                <button
-                  key={theme.name}
-                  type="button"
-                  onClick={() =>
-                    setSettings({
-                      ...settings,
-                      primaryColor: theme.primary,
-                      accentColor: theme.accent,
-                      highlightColor: theme.highlight
-                    })
-                  }
-                  className="text-left border border-cream-soft rounded-lg p-2.5 hover:border-berry transition-colors"
-                >
-                  <div className="flex gap-1 mb-1.5">
-                    <span className="h-4 w-4 rounded-full" style={{ background: theme.primary }} />
-                    <span className="h-4 w-4 rounded-full" style={{ background: theme.accent }} />
-                    <span className="h-4 w-4 rounded-full" style={{ background: theme.highlight }} />
-                  </div>
-                  <div className="text-[11px] font-medium text-plum">{theme.name}</div>
-                </button>
-              ))}
-            </div>
-          </div>
-
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <label className="text-xs text-ink-muted mb-1 block">Primary color</label>
