@@ -16,7 +16,7 @@ export default function ProductCard({ product }: { product: Product }) {
       <Link href={`/product/${product.slug}`}>
         <div className="h-40 bg-plum flex items-center justify-center relative overflow-hidden">
           {onSale && (
-            <span className="absolute top-2 left-2 z-10 bg-berry text-berry-text text-[11px] font-semibold px-2 py-0.5 rounded-full">
+            <span className="absolute top-2 left-2 z-10 bg-[#E11D3C] text-white text-xs font-bold px-2.5 py-1 rounded-md shadow-sm tracking-wide">
               {discountPercent(lowestVariant)}% OFF
             </span>
           )}
@@ -44,7 +44,7 @@ export default function ProductCard({ product }: { product: Product }) {
               {lowestVariant ? `Rs. ${lowestVariant.price}` : ""}
             </span>
             {onSale && (
-              <span className="text-xs text-ink-muted line-through">Rs. {lowestVariant!.compareAtPrice}</span>
+              <span className="text-xs text-[#B3261E] line-through font-medium">Rs. {lowestVariant!.compareAtPrice}</span>
             )}
           </span>
           <StockBadge status={product.stockStatus} />

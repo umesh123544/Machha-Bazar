@@ -347,11 +347,11 @@ export default function AdminProductsPage() {
                       <span className="text-xs font-medium text-plum">Rs. {p.variants[0]?.price ?? "-"}</span>
                       {hasDiscount(p.variants[0]) && (
                         <>
-                          <span className="text-[11px] text-ink-muted line-through">
+                          <span className="text-[11px] text-[#B3261E] line-through font-medium">
                             Rs. {p.variants[0]?.compareAtPrice}
                           </span>
-                          <span className="text-[10px] font-semibold text-berry-dark">
-                            {discountPercent(p.variants[0])}% off
+                          <span className="text-[10px] font-bold text-white bg-[#E11D3C] px-1.5 py-0.5 rounded">
+                            {discountPercent(p.variants[0])}% OFF
                           </span>
                         </>
                       )}
@@ -427,11 +427,11 @@ export default function AdminProductsPage() {
                         <span className="text-plum font-medium">Rs. {p.variants[0]?.price ?? "-"}</span>
                         {hasDiscount(p.variants[0]) && (
                           <>
-                            <span className="text-xs text-ink-muted line-through">
+                            <span className="text-xs text-[#B3261E] line-through font-medium">
                               Rs. {p.variants[0]?.compareAtPrice}
                             </span>
-                            <span className="text-[10px] font-semibold text-berry-dark bg-[#FBEAEA] px-1.5 py-0.5 rounded-full">
-                              {discountPercent(p.variants[0])}% off
+                            <span className="text-[10px] font-bold text-white bg-[#E11D3C] px-1.5 py-0.5 rounded">
+                              {discountPercent(p.variants[0])}% OFF
                             </span>
                           </>
                         )}

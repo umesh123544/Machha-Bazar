@@ -41,8 +41,8 @@ export default function ProductOrderPanel({
           </div>
           {hasDiscount(variant) && (
             <>
-              <span className="text-base text-ink-muted line-through">Rs. {variant.compareAtPrice}</span>
-              <span className="bg-berry text-berry-text text-xs font-semibold px-2 py-0.5 rounded-full">
+              <span className="text-base text-[#B3261E] line-through font-medium">Rs. {variant.compareAtPrice}</span>
+              <span className="bg-[#E11D3C] text-white text-xs font-bold px-2.5 py-1 rounded-md shadow-sm tracking-wide">
                 {discountPercent(variant)}% OFF
               </span>
             </>

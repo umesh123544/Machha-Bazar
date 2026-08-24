@@ -11,3 +11,10 @@ export function discountPercent(variant?: VariantOption | null): number {
   const { price, compareAtPrice } = variant as VariantOption;
   return Math.round(((compareAtPrice! - price) / compareAtPrice!) * 100);
 }
+
+/** Rupee amount saved. Returns 0 when there's no discount. */
+export function savedAmount(variant?: VariantOption | null): number {
+  if (!hasDiscount(variant)) return 0;
+  const { price, compareAtPrice } = variant as VariantOption;
+  return compareAtPrice! - price;
+}
