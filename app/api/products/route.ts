@@ -3,6 +3,11 @@ import { getAllProducts, addProduct } from "@/lib/data";
 import { requirePermission } from "@/lib/auth";
 import type { Product } from "@/lib/types";
 
+// Without this, Next.js treats this GET as static and caches the product
+// list at build time — so admin edits wouldn't show up on the site until
+// a redeploy. Force it dynamic so every request hits Supabase directly.
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   return NextResponse.json(await getAllProducts());
 }

@@ -33,7 +33,7 @@ export default function ProductCard({ product }: { product: Product }) {
         <p className="text-xs text-ink-muted mb-2 line-clamp-2">{product.shortDescription}</p>
         <div className="flex items-center justify-between mb-3">
           <span className="text-sm font-medium text-plum">
-            {lowestVariant ? `From Rs. ${lowestVariant.price}` : ""}
+            {lowestVariant ? `Rs. ${lowestVariant.price}` : ""}
           </span>
           <StockBadge status={product.stockStatus} />
         </div>

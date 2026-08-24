@@ -70,6 +70,18 @@ export type BannerSlide = {
   subheading: string;
 };
 
+export type OfferSettings = {
+  enabled: boolean;
+  title: string;
+  subtitle: string;
+  badge: string;
+  ctaText: string;
+  ctaLink: string;
+  endsAt: string;
+  image: string;
+  template: "gradient" | "minimal" | "ribbon" | "split" | "ticket" | "bar";
+};
+
 export type SiteSettings = {
   businessName: string;
   tagline: string;
@@ -88,7 +100,7 @@ export type SiteSettings = {
   bannerBadge: string;
   bannerHeadline: string;
   bannerSubheading: string;
-  bannerTemplate: "classic" | "split" | "centered" | "card" | "gradient" | "carousel";
+  bannerTemplate: "classic" | "split" | "centered" | "card" | "gradient" | "carousel" | "magazine" | "overlay" | "wave";
   bannerSlides: BannerSlide[];
   primaryColor: string;
   accentColor: string;
@@ -99,6 +111,7 @@ export type SiteSettings = {
   showAboutPage: boolean;
   /** When false, /delivery is hidden from the site (admin can toggle). */
   showDeliveryPage: boolean;
+  offer: OfferSettings;
 };
 
 export type AdminPermissions = {
