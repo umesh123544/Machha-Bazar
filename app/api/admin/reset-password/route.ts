@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { verifyOtp } from "@/lib/otp";
-import { adminResetStore } from "@/app/api/admin/forgot-password/route";
+import { adminResetStore } from "@/lib/admin-reset-store";
 import { getAdminUserByUsername } from "@/lib/data";
 import { supabaseAdmin } from "@/lib/supabaseClient";
 
@@ -30,12 +30,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: "Invalid code." }, { status: 400 });
   }
 
-  // OTP valid — clear it immediately (single use)
   adminResetStore.delete(key);
-
   const newHash = await bcrypt.hash(newPassword, 10);
 
-  // Try to update in admin_users table (DB-based admin)
   try {
     const dbUser = await getAdminUserByUsername(username);
     if (dbUser) {
@@ -50,12 +47,10 @@ export async function POST(req: NextRequest) {
     console.error("DB password update failed:", err);
   }
 
-  // Env-based admin: cannot update env vars at runtime — instruct user to update .env / Vercel
   const envUsername = process.env.ADMIN_USERNAME || "admin";
   if (username === envUsername) {
     return NextResponse.json({
-      message:
-        "Your admin account uses environment variables. Update ADMIN_PASSWORD in your Vercel environment variables and redeploy."
+      message: "Your admin account uses environment variables. Update ADMIN_PASSWORD in Vercel and redeploy."
     }, { status: 422 });
   }
 
