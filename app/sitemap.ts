@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getActiveProducts, getSiteSettings } from "@/lib/data";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://macchabazar.com";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://machha-bazar.vercel.app";
 
 export const dynamic = "force-dynamic";
 

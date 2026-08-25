@@ -7,7 +7,7 @@ import { rgbTriplet, adjustLightness, darkTextShade } from "@/lib/color";
 
 export const dynamic = "force-dynamic";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://macchabazar.com";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://machha-bazar.vercel.app";
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSiteSettings();
