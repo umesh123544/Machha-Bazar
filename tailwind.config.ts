@@ -41,6 +41,29 @@ const config: Config = {
       },
       borderRadius: {
         xl2: "20px"
+      },
+      keyframes: {
+        bump: {
+          "0%, 100%": { transform: "scale(1)" },
+          "30%": { transform: "scale(1.35)" },
+          "55%": { transform: "scale(0.9)" },
+          "75%": { transform: "scale(1.12)" }
+        },
+        pop: {
+          "0%": { transform: "scale(1)" },
+          "40%": { transform: "scale(1.4)" },
+          "100%": { transform: "scale(1)" }
+        },
+        wiggle: {
+          "0%, 100%": { transform: "rotate(0deg)" },
+          "25%": { transform: "rotate(-8deg)" },
+          "75%": { transform: "rotate(8deg)" }
+        }
+      },
+      animation: {
+        bump: "bump 0.5s ease-in-out",
+        pop: "pop 0.35s ease-in-out",
+        wiggle: "wiggle 0.4s ease-in-out"
       }
     }
   },

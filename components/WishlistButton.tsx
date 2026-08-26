@@ -28,6 +28,7 @@ export default function WishlistButton({
   const [saved, setSaved] = useState(!!initialSaved);
   const [loading, setLoading] = useState(false);
   const [checked, setChecked] = useState(initialSaved !== undefined);
+  const [pop, setPop] = useState(false);
 
   useEffect(() => {
     if (checked) return;
@@ -73,7 +74,11 @@ export default function WishlistButton({
           router.push("/account?mode=login");
           return;
         }
-        if (res.ok) setSaved(true);
+        if (res.ok) {
+          setSaved(true);
+          setPop(true);
+          setTimeout(() => setPop(false), 350);
+        }
       }
     } finally {
       setLoading(false);
@@ -87,11 +92,13 @@ export default function WishlistButton({
       disabled={loading}
       aria-label={saved ? "Remove from wishlist" : "Save to wishlist"}
       aria-pressed={saved}
-      className={`inline-flex items-center justify-center rounded-full transition-colors disabled:opacity-60 ${className}`}
+      className={`inline-flex items-center justify-center rounded-full transition-all hover:scale-110 active:scale-90 disabled:opacity-60 ${className}`}
     >
       <Heart
         size={size}
-        className={saved ? "fill-[#E11D3C] text-[#E11D3C]" : "text-ink-muted"}
+        className={`transition-transform ${pop ? "animate-pop" : ""} ${
+          saved ? "fill-[#E11D3C] text-[#E11D3C]" : "text-ink-muted"
+        }`}
         strokeWidth={saved ? 0 : 2}
       />
     </button>

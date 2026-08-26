@@ -43,12 +43,16 @@ export default function AddToCartButton({
   return (
     <button
       onClick={handleAdd}
-      className={
+      className={`${
         className ||
         "flex-1 flex items-center justify-center gap-2 bg-berry hover:bg-berry-dark text-white text-sm font-medium rounded-lg py-3 transition-colors"
-      }
+      } active:scale-95 transition-transform`}
     >
-      {justAdded ? <Check size={16} /> : <ShoppingCart size={16} />}
+      {justAdded ? (
+        <Check size={16} className="animate-pop" />
+      ) : (
+        <ShoppingCart size={16} className="group-hover:animate-wiggle" />
+      )}
       {justAdded ? "Added!" : label}
     </button>
   );

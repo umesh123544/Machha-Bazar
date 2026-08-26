@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { User, ShoppingCart } from "lucide-react";
 import GlobalSearch from "./GlobalSearch";
@@ -13,6 +13,8 @@ const DEFAULT_AVATAR = "/avatars/default-1.svg";
 export default function Navbar() {
   const { totalItems, openCart } = useCart();
   const [customer, setCustomer] = useState<MeCustomer>(null);
+  const [cartBump, setCartBump] = useState(false);
+  const prevTotalItems = useRef(totalItems);
 
   useEffect(() => {
     fetch("/api/auth/me")
@@ -51,12 +53,23 @@ export default function Navbar() {
     return () => window.removeEventListener("focus", onFocus);
   }, []);
 
+  // Bump the cart icon whenever an item is added (count goes up).
+  useEffect(() => {
+    if (totalItems > prevTotalItems.current) {
+      setCartBump(true);
+      const t = setTimeout(() => setCartBump(false), 500);
+      prevTotalItems.current = totalItems;
+      return () => clearTimeout(t);
+    }
+    prevTotalItems.current = totalItems;
+  }, [totalItems]);
+
   return (
     <header className="sticky top-0 z-40 bg-cream/95 backdrop-blur border-b border-cream-soft">
       <div className="max-w-6xl mx-auto flex items-center gap-2 sm:gap-4 px-3 sm:px-6 h-16">
         <Link
           href="/account"
-          className="flex-shrink-0 flex items-center text-plum hover:opacity-80"
+          className="flex-shrink-0 flex items-center text-plum hover:opacity-80 transition-transform hover:scale-105 active:scale-95"
           aria-label={customer ? "My account" : "Log in or sign up"}
         >
           {customer ? (
@@ -83,11 +96,15 @@ export default function Navbar() {
         <button
           onClick={openCart}
           aria-label="Open cart"
-          className="relative flex-shrink-0 text-plum hover:text-berry-dark"
+          className="relative flex-shrink-0 text-plum hover:text-berry-dark hover:scale-110 active:scale-95 transition-transform"
         >
-          <ShoppingCart size={22} />
+          <ShoppingCart size={22} className={cartBump ? "animate-bump" : ""} />
           {totalItems > 0 && (
-            <span className="absolute -top-2 -right-2 bg-berry text-white text-[10px] font-medium w-[18px] h-[18px] rounded-full flex items-center justify-center">
+            <span
+              className={`absolute -top-2 -right-2 bg-berry text-white text-[10px] font-medium w-[18px] h-[18px] rounded-full flex items-center justify-center ${
+                cartBump ? "animate-pop" : ""
+              }`}
+            >
               {totalItems > 9 ? "9+" : totalItems}
             </span>
           )}
