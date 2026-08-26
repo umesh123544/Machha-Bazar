@@ -15,7 +15,8 @@ import {
   MessageSquare,
   Menu,
   X,
-  Clock
+  Clock,
+  BarChart3
 } from "lucide-react";
 import type { AdminPermissions } from "@/lib/types";
 
@@ -46,6 +47,7 @@ export default function AdminSidebar() {
 
   const items = [
     { href: "/admin", label: "Overview", icon: LayoutDashboard, show: true },
+    { href: "/admin/analytics", label: "Analytics", icon: BarChart3, show: isOwner || permissions?.products },
     { href: "/admin/products", label: "Products", icon: Fish, show: isOwner || permissions?.products },
     { href: "/admin/categories", label: "Categories", icon: Layers, show: isOwner || permissions?.products },
     { href: "/admin/coming-soon", label: "Coming Soon", icon: Clock, show: isOwner || permissions?.products },
