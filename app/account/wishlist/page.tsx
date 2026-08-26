@@ -11,7 +11,7 @@ export default function WishlistPage() {
   const [loggedIn, setLoggedIn] = useState(true);
 
   useEffect(() => {
-    fetch("/api/wishlist")
+    fetch("/api/wishlist", { cache: "no-store" })
       .then((r) => r.json())
       .then((data) => {
         setLoggedIn(data.loggedIn !== false);

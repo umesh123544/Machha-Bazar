@@ -32,7 +32,7 @@ export default function WishlistButton({
   useEffect(() => {
     if (checked) return;
     let cancelled = false;
-    fetch("/api/wishlist?idsOnly=1")
+    fetch("/api/wishlist?idsOnly=1", { cache: "no-store" })
       .then((r) => r.json())
       .then((data) => {
         if (cancelled) return;

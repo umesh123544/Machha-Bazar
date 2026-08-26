@@ -8,16 +8,25 @@ export const dynamic = "force-dynamic";
 export async function GET(request: NextRequest) {
   const session = await getCurrentCustomer();
   if (!session) {
-    return NextResponse.json({ products: [], productIds: [], loggedIn: false });
+    return NextResponse.json(
+      { products: [], productIds: [], loggedIn: false },
+      { headers: { "Cache-Control": "no-store" } }
+    );
   }
 
   try {
     if (request.nextUrl.searchParams.get("idsOnly")) {
       const productIds = await getWishlistProductIds(session.customerId);
-      return NextResponse.json({ productIds, loggedIn: true });
+      return NextResponse.json(
+        { productIds, loggedIn: true },
+        { headers: { "Cache-Control": "no-store" } }
+      );
     }
     const products = await getWishlistProducts(session.customerId);
-    return NextResponse.json({ products, loggedIn: true });
+    return NextResponse.json(
+      { products, loggedIn: true },
+      { headers: { "Cache-Control": "no-store" } }
+    );
   } catch (err) {
     console.error("get wishlist error", err);
     return NextResponse.json(
