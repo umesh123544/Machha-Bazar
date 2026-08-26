@@ -977,3 +977,65 @@ export async function getCommentStatsByProduct(): Promise<
   }
   return result;
 }
+
+// ---- wishlist (save for later) ----
+
+export async function getWishlistProductIds(customerId: string): Promise<string[]> {
+  const { data, error } = await supabaseAdmin
+    .from("wishlist_items")
+    .select("product_id")
+    .eq("customer_id", customerId);
+  if (error) throw error;
+  return (data as { product_id: string }[]).map((r) => r.product_id);
+}
+
+export async function getWishlistProducts(customerId: string): Promise<Product[]> {
+  const { data, error } = await supabaseAdmin
+    .from("wishlist_items")
+    .select("product_id, created_at")
+    .eq("customer_id", customerId)
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  const ids = (data as { product_id: string }[]).map((r) => r.product_id);
+  if (!ids.length) return [];
+
+  const { data: productRows, error: productError } = await supabaseAdmin
+    .from("products")
+    .select("*")
+    .in("id", ids);
+  if (productError) throw productError;
+
+  const byId = new Map((productRows as ProductRow[]).map((r) => [r.id, rowToProduct(r)]));
+  // preserve the customer's save order (most recently saved first)
+  return ids.map((id) => byId.get(id)).filter((p): p is Product => !!p);
+}
+
+export async function isProductInWishlist(customerId: string, productId: string): Promise<boolean> {
+  const { data, error } = await supabaseAdmin
+    .from("wishlist_items")
+    .select("id")
+    .eq("customer_id", customerId)
+    .eq("product_id", productId)
+    .maybeSingle();
+  if (error) throw error;
+  return !!data;
+}
+
+export async function addToWishlist(customerId: string, productId: string): Promise<void> {
+  const { error } = await supabaseAdmin
+    .from("wishlist_items")
+    .upsert(
+      { id: `wl${Date.now()}${Math.random().toString(36).slice(2, 7)}`, customer_id: customerId, product_id: productId, created_at: new Date().toISOString() },
+      { onConflict: "customer_id,product_id", ignoreDuplicates: true }
+    );
+  if (error) throw error;
+}
+
+export async function removeFromWishlist(customerId: string, productId: string): Promise<void> {
+  const { error } = await supabaseAdmin
+    .from("wishlist_items")
+    .delete()
+    .eq("customer_id", customerId)
+    .eq("product_id", productId);
+  if (error) throw error;
+}

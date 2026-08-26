@@ -4,8 +4,17 @@ import type { Product } from "@/lib/types";
 import { hasDiscount, discountPercent } from "@/lib/pricing";
 import StockBadge from "./StockBadge";
 import AddToCartButton from "./AddToCartButton";
+import WishlistButton from "./WishlistButton";
 
-export default function ProductCard({ product }: { product: Product }) {
+export default function ProductCard({
+  product,
+  wishlisted,
+  onWishlistRemoved
+}: {
+  product: Product;
+  wishlisted?: boolean;
+  onWishlistRemoved?: () => void;
+}) {
   const lowestVariant = product.variants.slice().sort((a, b) => a.price - b.price)[0];
   const hasPhoto = product.image && !product.image.includes("fish-placeholder");
   const soldOut = product.stockStatus === "sold_out" || !lowestVariant;
@@ -20,6 +29,12 @@ export default function ProductCard({ product }: { product: Product }) {
               {discountPercent(lowestVariant)}% OFF
             </span>
           )}
+          <WishlistButton
+            productId={product.id}
+            initialSaved={wishlisted}
+            onRemoved={onWishlistRemoved}
+            className="absolute top-2 right-2 z-10 w-8 h-8 bg-white/90 hover:bg-white shadow-sm"
+          />
           {hasPhoto ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img

@@ -10,7 +10,8 @@ import {
   Pencil,
   Camera,
   ArrowLeft,
-  Clock
+  Clock,
+  Heart
 } from "lucide-react";
 import { useCart } from "@/lib/cart-context";
 import { COUNTRIES, DEFAULT_COUNTRY, findCountry, findCountryByDial, onlyDigits } from "@/lib/countries";
@@ -1059,6 +1060,18 @@ export default function AccountPage() {
           </p>
         )}
       </section>
+
+      {/* Wishlist */}
+      <Link
+        href="/account/wishlist"
+        className="flex items-center justify-between bg-white border border-cream-soft rounded-2xl p-5 hover:border-berry transition-colors"
+      >
+        <div className="flex items-center gap-2">
+          <Heart size={16} className="text-berry-dark" />
+          <h2 className="text-sm font-medium text-plum">My Wishlist</h2>
+        </div>
+        <span className="text-xs text-ink-muted">View saved fish →</span>
+      </Link>
 
       {/* Cart */}
       <section className="bg-white border border-cream-soft rounded-2xl p-5">

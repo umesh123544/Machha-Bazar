@@ -7,6 +7,7 @@ import { buildInquiryMessage, whatsappLink } from "@/lib/whatsapp";
 import { hasDiscount, discountPercent } from "@/lib/pricing";
 import AddToCartButton from "./AddToCartButton";
 import StockBadge from "./StockBadge";
+import WishlistButton from "./WishlistButton";
 
 export default function ProductOrderPanel({
   product,
@@ -31,7 +32,14 @@ export default function ProductOrderPanel({
         <span className="text-xs font-medium text-berry-dark">{product.category}</span>
         <StockBadge status={product.stockStatus} />
       </div>
-      <h1 className="text-2xl sm:text-3xl font-medium text-plum mb-2">{product.name}</h1>
+      <div className="flex items-start justify-between gap-3 mb-2">
+        <h1 className="text-2xl sm:text-3xl font-medium text-plum">{product.name}</h1>
+        <WishlistButton
+          productId={product.id}
+          size={22}
+          className="w-11 h-11 border border-cream-soft hover:border-berry shrink-0"
+        />
+      </div>
       <p className="text-sm text-ink-muted mb-6">{product.shortDescription}</p>
 
       {variant && (
