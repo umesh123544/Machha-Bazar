@@ -51,7 +51,7 @@ export default function AddToCartButton({
       {justAdded ? (
         <Check size={16} className="animate-pop" />
       ) : (
-        <ShoppingCart size={16} className="group-hover:animate-wiggle" />
+        <ShoppingCart size={16} className="icon-wiggle-loop" />
       )}
       {justAdded ? "Added!" : label}
     </button>

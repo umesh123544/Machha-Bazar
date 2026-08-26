@@ -28,7 +28,7 @@ export default function BottomNav({ whatsappNumber }: { whatsappNumber: string }
                 active ? "text-berry-dark" : "text-ink-muted"
               }`}
             >
-              <Icon size={20} strokeWidth={active ? 2.4 : 2} />
+              <Icon size={20} strokeWidth={active ? 2.4 : 2} className={active ? "icon-float" : ""} />
               {tab.label}
             </Link>
           );
@@ -39,7 +39,7 @@ export default function BottomNav({ whatsappNumber }: { whatsappNumber: string }
           rel="noopener noreferrer"
           className="flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 text-[11px] font-medium text-[#1E7A6E]"
         >
-          <MessageCircle size={20} />
+          <MessageCircle size={20} className="icon-wiggle-loop" />
           WhatsApp
         </a>
       </div>

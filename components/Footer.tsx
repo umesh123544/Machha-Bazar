@@ -78,16 +78,18 @@ export default function Footer({ settings }: { settings: SiteSettings }) {
 
           {/* Social icons */}
           <div className="flex items-center gap-4 mt-4 flex-wrap">
-            {socialLinks.filter((l) => l.show).map((l) => (
+            {socialLinks.filter((l) => l.show).map((l, i) => (
               <a
                 key={l.label}
                 href={l.href}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={l.label}
-                className="text-cream/70 hover:text-amber transition-colors"
+                className="text-cream/70 hover:text-amber hover:scale-110 transition-all"
               >
-                {l.icon}
+                <span className={`inline-block icon-float ${["", "icon-delay-1", "icon-delay-2", "icon-delay-3", "icon-delay-4"][i % 5]}`}>
+                  {l.icon}
+                </span>
               </a>
             ))}
           </div>

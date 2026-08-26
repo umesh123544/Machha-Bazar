@@ -29,3 +29,41 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/* ---- Continuous idle icon animations (visible on page load, not just on click) ---- */
+
+@keyframes icon-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+@keyframes icon-wiggle-loop {
+  0%, 100% { transform: rotate(0deg); }
+  20% { transform: rotate(-10deg); }
+  40% { transform: rotate(9deg); }
+  60% { transform: rotate(-6deg); }
+  80% { transform: rotate(4deg); }
+}
+
+@keyframes icon-pulse-soft {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.12); opacity: 0.85; }
+}
+
+.icon-float {
+  animation: icon-float 2.4s ease-in-out infinite;
+}
+
+.icon-wiggle-loop {
+  animation: icon-wiggle-loop 3.2s ease-in-out infinite;
+}
+
+.icon-pulse-soft {
+  animation: icon-pulse-soft 2s ease-in-out infinite;
+}
+
+/* stagger helpers so groups of icons don't all move in perfect unison */
+.icon-delay-1 { animation-delay: 0.15s; }
+.icon-delay-2 { animation-delay: 0.3s; }
+.icon-delay-3 { animation-delay: 0.45s; }
+.icon-delay-4 { animation-delay: 0.6s; }

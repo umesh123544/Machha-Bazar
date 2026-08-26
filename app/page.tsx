@@ -72,9 +72,10 @@ export default async function HomePage() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
             {content.whyItems.map((item, i) => {
               const Icon = ICON_MAP[item.icon] || Fish;
+              const delayClass = ["", "icon-delay-1", "icon-delay-2", "icon-delay-3"][i % 4];
               return (
                 <div key={i} className="bg-white rounded-xl p-5 text-center border border-cream-soft">
-                  <Icon className="mx-auto mb-3 text-berry-dark" size={22} />
+                  <Icon className={`mx-auto mb-3 text-berry-dark icon-float ${delayClass}`} size={22} />
                   <div className="text-sm font-medium text-plum mb-1">{item.title}</div>
                   <p className="text-xs text-ink-muted">{item.desc}</p>
                 </div>

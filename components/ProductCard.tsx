@@ -43,7 +43,7 @@ export default function ProductCard({
               className="absolute inset-0 w-full h-full object-cover"
             />
           ) : (
-            <Fish size={48} className="text-amber group-hover:scale-105 transition-transform" />
+            <Fish size={48} className="text-amber icon-float group-hover:scale-105 transition-transform" />
           )}
         </div>
       </Link>

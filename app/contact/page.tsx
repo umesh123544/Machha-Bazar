@@ -38,29 +38,29 @@ export default async function ContactPage() {
         rel="noopener noreferrer"
         className="flex items-center justify-center gap-2 bg-berry hover:bg-berry-dark text-white text-sm font-medium rounded-lg py-3 mb-10"
       >
-        <MessageCircle size={16} />
+        <MessageCircle size={16} className="icon-wiggle-loop" />
         Chat With Us
       </a>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
         <div className="flex items-center gap-3 bg-white border border-cream-soft rounded-xl p-4">
-          <Phone size={18} className="text-berry-dark" />
+          <Phone size={18} className="text-berry-dark icon-float" />
           <span className="text-sm text-ink">{settings.phone}</span>
         </div>
         <div className="flex items-center gap-3 bg-white border border-cream-soft rounded-xl p-4">
-          <MapPin size={18} className="text-berry-dark" />
+          <MapPin size={18} className="text-berry-dark icon-float icon-delay-1" />
           <span className="text-sm text-ink">{settings.address}</span>
         </div>
         <div className="flex items-center gap-3 bg-white border border-cream-soft rounded-xl p-4">
-          <Clock size={18} className="text-berry-dark" />
+          <Clock size={18} className="text-berry-dark icon-float icon-delay-2" />
           <span className="text-sm text-ink">{settings.businessHours}</span>
         </div>
         <div className="flex items-center gap-3 bg-white border border-cream-soft rounded-xl p-4">
           <div className="flex gap-3">
             <a href={settings.facebookUrl} target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="text-berry-dark">
-              <Facebook size={18} />
+              <Facebook size={18} className="icon-float" />
             </a>
             <a href={settings.instagramUrl} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-berry-dark">
-              <Instagram size={18} />
+              <Instagram size={18} className="icon-float icon-delay-1" />
             </a>
           </div>
           <span className="text-sm text-ink">Follow us</span>

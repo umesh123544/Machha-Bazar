@@ -96,7 +96,7 @@ export default function WishlistButton({
     >
       <Heart
         size={size}
-        className={`transition-transform ${pop ? "animate-pop" : ""} ${
+        className={`transition-transform ${pop ? "animate-pop" : saved ? "icon-pulse-soft" : ""} ${
           saved ? "fill-[#E11D3C] text-[#E11D3C]" : "text-ink-muted"
         }`}
         strokeWidth={saved ? 0 : 2}
