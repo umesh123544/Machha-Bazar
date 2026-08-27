@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { MessageCircle, Facebook, Instagram, Youtube } from "lucide-react";
+import { Facebook, Instagram, Youtube } from "lucide-react";
+import WhatsAppIcon from "./WhatsAppIcon";
 import type { SiteSettings } from "@/lib/types";
 
 // TikTok icon (not in lucide-react, so inline SVG)
@@ -26,7 +27,7 @@ export default function Footer({ settings }: { settings: SiteSettings }) {
     {
       href: `https://wa.me/${settings.whatsappNumber}`,
       label: "WhatsApp",
-      icon: <MessageCircle size={18} />,
+      icon: <WhatsAppIcon size={18} />,
       show: !!settings.whatsappNumber,
     },
     {

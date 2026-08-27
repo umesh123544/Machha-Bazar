@@ -1,6 +1,7 @@
 "use client";
 
-import { X, Minus, Plus, Trash2, MessageCircle, Fish } from "lucide-react";
+import { X, Minus, Plus, Trash2, Fish } from "lucide-react";
+import WhatsAppIcon from "./WhatsAppIcon";
 import { useCart } from "@/lib/cart-context";
 import { buildCartOrderMessage, whatsappLink } from "@/lib/whatsapp";
 
@@ -113,7 +114,7 @@ export default function CartDrawer({
               onClick={handleCheckout}
               className="flex items-center justify-center gap-2 bg-berry hover:bg-berry-dark text-white text-sm font-medium rounded-lg py-3 w-full transition-colors"
             >
-              <MessageCircle size={16} />
+              <WhatsAppIcon size={16} className="icon-ring" />
               Checkout via WhatsApp
             </a>
           </div>

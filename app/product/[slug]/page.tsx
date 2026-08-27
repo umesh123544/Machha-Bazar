@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { Fish, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import SwimmingFish from "@/components/SwimmingFish";
 import type { Metadata } from "next";
 import { getProductBySlug, getSiteSettings } from "@/lib/data";
 import ProductOrderPanel from "@/components/ProductOrderPanel";
@@ -68,7 +69,7 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
               className="absolute inset-0 w-full h-full object-cover"
             />
           ) : (
-            <Fish size={90} className="text-amber" />
+            <SwimmingFish size={80} className="text-amber" />
           )}
         </div>
         <ProductOrderPanel product={product} whatsappNumber={settings.whatsappNumber} businessName={settings.businessName} />

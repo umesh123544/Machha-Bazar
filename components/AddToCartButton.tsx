@@ -1,6 +1,6 @@
 "use client";
 
-import { ShoppingCart, Check } from "lucide-react";
+import { ShoppingBag, Check } from "lucide-react";
 import { useState } from "react";
 import { useCart } from "@/lib/cart-context";
 import type { Product, VariantOption } from "@/lib/types";
@@ -51,7 +51,7 @@ export default function AddToCartButton({
       {justAdded ? (
         <Check size={16} className="animate-pop" />
       ) : (
-        <ShoppingCart size={16} className="icon-sway" />
+        <ShoppingBag size={16} className="icon-sway" />
       )}
       {justAdded ? "Added!" : label}
     </button>

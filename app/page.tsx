@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { MessageCircle, Egg, Camera, Truck, Fish, Heart, ShieldCheck, Leaf, Star, Droplet, Sparkles } from "lucide-react";
+import { Egg, Camera, Truck, Fish, Heart, ShieldCheck, Leaf, Star, Droplet, Sparkles } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import WhatsAppIcon from "@/components/WhatsAppIcon";
 import { getActiveProducts, getCategories, getSiteSettings } from "@/lib/data";
 import ProductCard from "@/components/ProductCard";
 import InstallPWA from "@/components/InstallPWA";
@@ -140,7 +141,7 @@ export default async function HomePage() {
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 bg-berry hover:bg-berry-dark text-white text-sm font-medium px-6 py-3 rounded-lg"
         >
-          <MessageCircle size={16} />
+          <WhatsAppIcon size={16} className="icon-ring" />
           Chat on WhatsApp
         </a>
       </section>

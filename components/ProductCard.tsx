@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Fish } from "lucide-react";
+import SwimmingFish from "./SwimmingFish";
 import type { Product } from "@/lib/types";
 import { hasDiscount, discountPercent } from "@/lib/pricing";
 import StockBadge from "./StockBadge";
@@ -43,7 +43,7 @@ export default function ProductCard({
               className="absolute inset-0 w-full h-full object-cover"
             />
           ) : (
-            <Fish size={48} className="text-amber icon-swim group-hover:scale-105 transition-transform" />
+            <div className="group-hover:scale-105 transition-transform"><SwimmingFish size={44} className="text-amber" /></div>
           )}
         </div>
       </Link>
