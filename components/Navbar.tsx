@@ -98,7 +98,7 @@ export default function Navbar() {
           aria-label="Open cart"
           className="relative flex-shrink-0 text-plum hover:text-berry-dark hover:scale-110 active:scale-95 transition-transform"
         >
-          <ShoppingCart size={22} className={cartBump ? "animate-bump" : "icon-float"} />
+          <ShoppingCart size={22} className={cartBump ? "animate-bump" : "icon-sway"} />
           {totalItems > 0 && (
             <span
               className={`absolute -top-2 -right-2 bg-berry text-white text-[10px] font-medium w-[18px] h-[18px] rounded-full flex items-center justify-center ${

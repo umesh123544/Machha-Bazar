@@ -33,16 +33,42 @@ body {
 /* ---- Continuous idle icon animations (visible on page load, not just on click) ---- */
 
 @keyframes icon-float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-5px) rotate(-4deg); }
 }
 
-@keyframes icon-wiggle-loop {
+/* fish-style side-to-side swim wiggle, fitting for an aquarium shop */
+@keyframes icon-swim {
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  25% { transform: translateX(-3px) rotate(-8deg); }
+  75% { transform: translateX(3px) rotate(8deg); }
+}
+
+/* real heartbeat rhythm: thump-thump, pause */
+@keyframes icon-heartbeat {
+  0%, 100% { transform: scale(1); }
+  14% { transform: scale(1.22); }
+  28% { transform: scale(1); }
+  42% { transform: scale(1.18); }
+  56% { transform: scale(1); }
+}
+
+/* a shopping bag/cart gently swinging as if being carried */
+@keyframes icon-sway {
   0%, 100% { transform: rotate(0deg); }
-  20% { transform: rotate(-10deg); }
-  40% { transform: rotate(9deg); }
-  60% { transform: rotate(-6deg); }
-  80% { transform: rotate(4deg); }
+  25% { transform: rotate(-9deg); }
+  75% { transform: rotate(9deg); }
+}
+
+/* phone-ring style shake, good for chat/WhatsApp icons */
+@keyframes icon-ring {
+  0%, 96%, 100% { transform: rotate(0deg); }
+  2% { transform: rotate(-14deg); }
+  4% { transform: rotate(12deg); }
+  6% { transform: rotate(-10deg); }
+  8% { transform: rotate(8deg); }
+  10% { transform: rotate(-4deg); }
+  12% { transform: rotate(0deg); }
 }
 
 @keyframes icon-pulse-soft {
@@ -52,10 +78,32 @@ body {
 
 .icon-float {
   animation: icon-float 2.4s ease-in-out infinite;
+  transform-origin: center;
+}
+
+.icon-swim {
+  animation: icon-swim 1.8s ease-in-out infinite;
+  transform-origin: center;
+}
+
+.icon-heartbeat {
+  animation: icon-heartbeat 2.2s ease-in-out infinite;
+  transform-origin: center;
+}
+
+.icon-sway {
+  animation: icon-sway 2.6s ease-in-out infinite;
+  transform-origin: top center;
+}
+
+.icon-ring {
+  animation: icon-ring 3.5s ease-in-out infinite;
+  transform-origin: center;
 }
 
 .icon-wiggle-loop {
-  animation: icon-wiggle-loop 3.2s ease-in-out infinite;
+  animation: icon-ring 3.5s ease-in-out infinite;
+  transform-origin: center;
 }
 
 .icon-pulse-soft {
