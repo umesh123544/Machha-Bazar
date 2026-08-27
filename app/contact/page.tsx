@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
-import { MessageCircle, Phone, Facebook, Instagram, MapPin, Clock } from "lucide-react";
+import { Facebook, Instagram, MapPin, Clock } from "lucide-react";
+import { PhoneCallIcon } from "lucide-animated";
+import AutoAnimIcon from "@/components/AutoAnimIcon";
+import WhatsAppIcon from "@/components/WhatsAppIcon";
 import { getSiteSettings, getPageContent } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
@@ -38,29 +41,29 @@ export default async function ContactPage() {
         rel="noopener noreferrer"
         className="flex items-center justify-center gap-2 bg-berry hover:bg-berry-dark text-white text-sm font-medium rounded-lg py-3 mb-10"
       >
-        <MessageCircle size={16} className="icon-wiggle-loop" />
+        <WhatsAppIcon size={16} />
         Chat With Us
       </a>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
         <div className="flex items-center gap-3 bg-white border border-cream-soft rounded-xl p-4">
-          <Phone size={18} className="text-berry-dark icon-float" />
+          <AutoAnimIcon icon={PhoneCallIcon} size={18} intervalMs={3000} className="text-berry-dark" />
           <span className="text-sm text-ink">{settings.phone}</span>
         </div>
         <div className="flex items-center gap-3 bg-white border border-cream-soft rounded-xl p-4">
-          <MapPin size={18} className="text-berry-dark icon-float icon-delay-1" />
+          <MapPin size={18} className="text-berry-dark " />
           <span className="text-sm text-ink">{settings.address}</span>
         </div>
         <div className="flex items-center gap-3 bg-white border border-cream-soft rounded-xl p-4">
-          <Clock size={18} className="text-berry-dark icon-float icon-delay-2" />
+          <Clock size={18} className="text-berry-dark " />
           <span className="text-sm text-ink">{settings.businessHours}</span>
         </div>
         <div className="flex items-center gap-3 bg-white border border-cream-soft rounded-xl p-4">
           <div className="flex gap-3">
             <a href={settings.facebookUrl} target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="text-berry-dark">
-              <Facebook size={18} className="icon-float" />
+              <Facebook size={18}  />
             </a>
             <a href={settings.instagramUrl} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-berry-dark">
-              <Instagram size={18} className="icon-float icon-delay-1" />
+              <Instagram size={18}  />
             </a>
           </div>
           <span className="text-sm text-ink">Follow us</span>

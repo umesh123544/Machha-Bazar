@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Fish } from "lucide-react";
+import { FishSymbolIcon } from "lucide-animated";
+import AutoAnimIcon from "./AutoAnimIcon";
 import type { Product } from "@/lib/types";
 import { hasDiscount, discountPercent } from "@/lib/pricing";
 import StockBadge from "./StockBadge";
@@ -43,7 +44,9 @@ export default function ProductCard({
               className="absolute inset-0 w-full h-full object-cover"
             />
           ) : (
-            <Fish size={48} className="text-amber icon-swim group-hover:scale-105 transition-transform" />
+            <div className="group-hover:scale-105 transition-transform">
+              <AutoAnimIcon icon={FishSymbolIcon} size={44} intervalMs={2800} className="text-amber" />
+            </div>
           )}
         </div>
       </Link>

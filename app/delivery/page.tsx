@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { MessageCircle, Truck } from "lucide-react";
+import { Truck } from "lucide-react";
+import WhatsAppIcon from "@/components/WhatsAppIcon";
 import { getSiteSettings } from "@/lib/data";
 import { whatsappLink, buildDeliveryCheckMessage } from "@/lib/whatsapp";
 
@@ -25,7 +26,7 @@ export default async function DeliveryPage() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-14">
-      <Truck className="text-berry-dark mb-4 icon-float" size={28} />
+      <Truck className="text-berry-dark mb-4" size={28} />
       <h1 className="text-2xl sm:text-3xl font-medium text-plum mb-3">Safe live fish delivery</h1>
       <p className="text-sm text-ink-muted leading-relaxed mb-6">
         We currently provide live fish delivery inside Kathmandu Valley. Fish are packed carefully to travel
@@ -48,7 +49,7 @@ export default async function DeliveryPage() {
         rel="noopener noreferrer"
         className="inline-flex items-center gap-2 bg-berry hover:bg-berry-dark text-white text-sm font-medium px-6 py-3 rounded-lg"
       >
-        <MessageCircle size={16} className="icon-wiggle-loop" />
+        <WhatsAppIcon size={16} />
         Check Delivery Availability
       </a>
     </div>

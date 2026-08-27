@@ -2,7 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { User, ShoppingCart } from "lucide-react";
+import { User } from "lucide-react";
+import { CartIcon } from "lucide-animated";
+import AutoAnimIcon from "./AutoAnimIcon";
 import GlobalSearch from "./GlobalSearch";
 import { useCart } from "@/lib/cart-context";
 
@@ -82,7 +84,7 @@ export default function Navbar() {
           ) : (
             <span className="flex items-center gap-1.5">
               <span className="w-9 h-9 rounded-full border border-cream-soft bg-white flex items-center justify-center">
-                <User size={18} className="icon-float" />
+                <User size={18} />
               </span>
               <span className="hidden sm:inline text-xs font-medium">Login</span>
             </span>
@@ -98,7 +100,9 @@ export default function Navbar() {
           aria-label="Open cart"
           className="relative flex-shrink-0 text-plum hover:text-berry-dark hover:scale-110 active:scale-95 transition-transform"
         >
-          <ShoppingCart size={22} className={cartBump ? "animate-bump" : "icon-sway"} />
+          <span className={cartBump ? "inline-block animate-bump" : "inline-block"}>
+            <AutoAnimIcon icon={CartIcon} size={24} intervalMs={3200} className="text-plum" />
+          </span>
           {totalItems > 0 && (
             <span
               className={`absolute -top-2 -right-2 bg-berry text-white text-[10px] font-medium w-[18px] h-[18px] rounded-full flex items-center justify-center ${

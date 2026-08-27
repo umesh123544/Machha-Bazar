@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { MessageCircle, Egg, Camera, Truck, Fish, Heart, ShieldCheck, Leaf, Star, Droplet, Sparkles } from "lucide-react";
+import { Egg, Camera, Truck, Fish, Heart, ShieldCheck, Leaf, Star, Droplet, Sparkles } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import WhatsAppIcon from "@/components/WhatsAppIcon";
 import { getActiveProducts, getCategories, getSiteSettings } from "@/lib/data";
 import ProductCard from "@/components/ProductCard";
 import InstallPWA from "@/components/InstallPWA";
@@ -72,10 +73,10 @@ export default async function HomePage() {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
             {content.whyItems.map((item, i) => {
               const Icon = ICON_MAP[item.icon] || Fish;
-              const delayClass = ["", "icon-delay-1", "icon-delay-2", "icon-delay-3"][i % 4];
+              const delayClass = ["", "", "", ""][i % 4];
               return (
                 <div key={i} className="bg-white rounded-xl p-5 text-center border border-cream-soft">
-                  <Icon className={`mx-auto mb-3 text-berry-dark icon-float ${delayClass}`} size={22} />
+                  <Icon className={`mx-auto mb-3 text-berry-dark ${delayClass}`} size={22} />
                   <div className="text-sm font-medium text-plum mb-1">{item.title}</div>
                   <p className="text-xs text-ink-muted">{item.desc}</p>
                 </div>
@@ -140,7 +141,7 @@ export default async function HomePage() {
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 bg-berry hover:bg-berry-dark text-white text-sm font-medium px-6 py-3 rounded-lg"
         >
-          <MessageCircle size={16} />
+          <WhatsAppIcon size={16} />
           Chat on WhatsApp
         </a>
       </section>

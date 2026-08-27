@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { MessageCircle, Fish, ArrowRight } from "lucide-react";
+import { Fish, ArrowRight } from "lucide-react";
+import WhatsAppIcon from "./WhatsAppIcon";
 import type { SiteSettings } from "@/lib/types";
 
 const TAGLINE = "Home-bred fish · Real photos · Kathmandu Valley delivery";
@@ -116,7 +117,7 @@ export default function BannerSingle({ settings }: { settings: SiteSettings }) {
             rel="noopener noreferrer"
             className="flex items-center gap-2 border border-cream/30 text-cream text-sm font-medium px-6 py-3 rounded-lg hover:bg-white/10 transition-colors"
           >
-            <MessageCircle size={16} />
+            <WhatsAppIcon size={16} />
             Chat on WhatsApp
           </a>
         </div>
@@ -250,7 +251,7 @@ function CtaButtons({ whatsappNumber, variant }: { whatsappNumber: string; varia
             : "flex items-center gap-2 border border-plum/20 text-plum text-sm font-medium px-6 py-3 rounded-lg hover:bg-plum/5 transition-colors"
         }
       >
-        <MessageCircle size={16} />
+        <WhatsAppIcon size={16} />
         Chat on WhatsApp
       </a>
     </>

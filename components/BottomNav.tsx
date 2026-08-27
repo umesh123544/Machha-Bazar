@@ -2,16 +2,18 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, ShoppingBag, BookOpen, MessageCircle, Phone } from "lucide-react";
+import { HomeIcon, BoxIcon, BookTextIcon, PhoneCallIcon } from "lucide-animated";
+import AutoAnimIcon from "./AutoAnimIcon";
+import WhatsAppIcon from "./WhatsAppIcon";
 
 export default function BottomNav({ whatsappNumber }: { whatsappNumber: string }) {
   const pathname = usePathname();
 
   const tabs = [
-    { href: "/", label: "Home", icon: Home },
-    { href: "/shop", label: "Shop", icon: ShoppingBag },
-    { href: "/care-guide", label: "Care", icon: BookOpen },
-    { href: "/contact", label: "Contact", icon: Phone }
+    { href: "/", label: "Home", icon: HomeIcon, delay: 0 },
+    { href: "/shop", label: "Shop", icon: BoxIcon, delay: 400 },
+    { href: "/care-guide", label: "Care", icon: BookTextIcon, delay: 800 },
+    { href: "/contact", label: "Contact", icon: PhoneCallIcon, delay: 1200 }
   ];
 
   return (
@@ -19,7 +21,6 @@ export default function BottomNav({ whatsappNumber }: { whatsappNumber: string }
       <div className="flex w-full max-w-2xl mx-auto">
         {tabs.map((tab) => {
           const active = tab.href === "/" ? pathname === "/" : pathname?.startsWith(tab.href);
-          const Icon = tab.icon;
           return (
             <Link
               key={tab.href}
@@ -28,7 +29,7 @@ export default function BottomNav({ whatsappNumber }: { whatsappNumber: string }
                 active ? "text-berry-dark" : "text-ink-muted"
               }`}
             >
-              <Icon size={20} strokeWidth={active ? 2.4 : 2} className={active ? "icon-float" : ""} />
+              <AutoAnimIcon icon={tab.icon} size={20} intervalMs={3600} delayMs={tab.delay} className="text-current" />
               {tab.label}
             </Link>
           );
@@ -39,7 +40,7 @@ export default function BottomNav({ whatsappNumber }: { whatsappNumber: string }
           rel="noopener noreferrer"
           className="flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 text-[11px] font-medium text-[#1E7A6E]"
         >
-          <MessageCircle size={20} className="icon-wiggle-loop" />
+          <WhatsAppIcon size={20} className="icon-ring" />
           WhatsApp
         </a>
       </div>
