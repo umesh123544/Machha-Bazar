@@ -2,8 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight, Fish } from "lucide-react";
-import WhatsAppIcon from "./WhatsAppIcon";
+import { MessageCircle, ChevronLeft, ChevronRight, Fish } from "lucide-react";
 import type { BannerSlide } from "@/lib/types";
 
 export default function BannerCarousel({
@@ -96,7 +95,7 @@ export default function BannerCarousel({
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 border border-plum/20 text-plum text-sm font-medium px-6 py-3 rounded-lg hover:bg-plum/5 transition-colors"
                   >
-                    <WhatsAppIcon size={16} className="icon-ring" />
+                    <MessageCircle size={16} />
                     Chat on WhatsApp
                   </a>
                 </div>

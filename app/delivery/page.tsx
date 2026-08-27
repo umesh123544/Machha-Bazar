@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Truck } from "lucide-react";
-import WhatsAppIcon from "@/components/WhatsAppIcon";
+import { MessageCircle, Truck } from "lucide-react";
 import { getSiteSettings } from "@/lib/data";
 import { whatsappLink, buildDeliveryCheckMessage } from "@/lib/whatsapp";
 
@@ -49,7 +48,7 @@ export default async function DeliveryPage() {
         rel="noopener noreferrer"
         className="inline-flex items-center gap-2 bg-berry hover:bg-berry-dark text-white text-sm font-medium px-6 py-3 rounded-lg"
       >
-        <WhatsAppIcon size={16} className="icon-ring" />
+        <MessageCircle size={16} className="icon-wiggle-loop" />
         Check Delivery Availability
       </a>
     </div>

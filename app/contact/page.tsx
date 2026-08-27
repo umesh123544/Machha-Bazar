@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { Phone, PhoneCall, Facebook, Instagram, MapPin, Clock } from "lucide-react";
-import WhatsAppIcon from "@/components/WhatsAppIcon";
+import { MessageCircle, Phone, Facebook, Instagram, MapPin, Clock } from "lucide-react";
 import { getSiteSettings, getPageContent } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
@@ -39,12 +38,12 @@ export default async function ContactPage() {
         rel="noopener noreferrer"
         className="flex items-center justify-center gap-2 bg-berry hover:bg-berry-dark text-white text-sm font-medium rounded-lg py-3 mb-10"
       >
-        <WhatsAppIcon size={16} className="icon-ring" />
+        <MessageCircle size={16} className="icon-wiggle-loop" />
         Chat With Us
       </a>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-10">
         <div className="flex items-center gap-3 bg-white border border-cream-soft rounded-xl p-4">
-          <PhoneCall size={18} className="text-berry-dark icon-float" />
+          <Phone size={18} className="text-berry-dark icon-float" />
           <span className="text-sm text-ink">{settings.phone}</span>
         </div>
         <div className="flex items-center gap-3 bg-white border border-cream-soft rounded-xl p-4">

@@ -2,8 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, ShoppingBag, BookOpen, PhoneCall } from "lucide-react";
-import WhatsAppIcon from "./WhatsAppIcon";
+import { Home, ShoppingBag, BookOpen, MessageCircle, Phone } from "lucide-react";
 
 export default function BottomNav({ whatsappNumber }: { whatsappNumber: string }) {
   const pathname = usePathname();
@@ -12,7 +11,7 @@ export default function BottomNav({ whatsappNumber }: { whatsappNumber: string }
     { href: "/", label: "Home", icon: Home },
     { href: "/shop", label: "Shop", icon: ShoppingBag },
     { href: "/care-guide", label: "Care", icon: BookOpen },
-    { href: "/contact", label: "Contact", icon: PhoneCall }
+    { href: "/contact", label: "Contact", icon: Phone }
   ];
 
   return (
@@ -40,7 +39,7 @@ export default function BottomNav({ whatsappNumber }: { whatsappNumber: string }
           rel="noopener noreferrer"
           className="flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 text-[11px] font-medium text-[#1E7A6E]"
         >
-          <WhatsAppIcon size={20} className="icon-ring" />
+          <MessageCircle size={20} className="icon-wiggle-loop" />
           WhatsApp
         </a>
       </div>
